@@ -1,0 +1,19 @@
+/* Tavi memo palette and typography; keep Mintlify navigation responsive. */
+:root{--tavi-ink:#040F31;--tavi-secondary:#4A5578;--tavi-rule:#E3E8F2;--tavi-wash:#F3F6FC;--tavi-accent:#5B3FC4;--content-width:800px}
+.dark{--tavi-ink:#D8EAFF;--tavi-secondary:#A3AED0;--tavi-rule:#263657;--tavi-wash:#101D3D;--tavi-accent:#C5AAFB}
+body{font-family:"Instrument Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+#page-title{color:var(--tavi-ink);font-weight:600;letter-spacing:-.035em;line-height:1.12}
+#header .prose{color:var(--tavi-secondary)}
+#content{--tw-prose-body:var(--tavi-ink);--tw-prose-headings:var(--tavi-ink);--tw-prose-bold:var(--tavi-ink);--tw-prose-links:var(--tavi-accent);--tw-prose-th-borders:var(--tavi-rule);--tw-prose-td-borders:var(--tavi-rule);line-height:1.7;color:var(--tavi-ink)}
+#content h2{font-weight:600;letter-spacing:-.025em;margin-top:2.75rem;color:var(--tavi-ink)}
+#content h3{font-weight:600;color:var(--tavi-ink)}
+#content p{margin-top:1.25rem;margin-bottom:1.25rem}
+#content a{color:var(--tavi-accent);text-decoration-color:#C5AAFB;text-underline-offset:4px}
+#content blockquote{background:var(--tavi-wash);border-left:3px solid #C5AAFB;border-radius:0 6px 6px 0;padding:1px 20px;font-style:normal;color:var(--tavi-ink)}
+#content table{font-size:.875rem;line-height:1.6}
+#content th{background:var(--tavi-wash);color:var(--tavi-ink);font-weight:600}
+#content th,#content td{padding:12px 14px;border-color:var(--tavi-rule)}
+#content img{border-radius:8px}
+#sidebar a[aria-current="page"]{background:#E7EEFA;color:#001D56}
+.dark #sidebar a[aria-current="page"]{background:#1D0446;color:#D8EAFF}
+::selection{background:#C5AAFB66}

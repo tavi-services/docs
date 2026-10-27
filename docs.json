@@ -3,7 +3,9 @@
   "theme": "mint",
   "name": "Tavi Partner API",
   "colors": {
-    "primary": "#0B6753"
+    "primary": "#001D56",
+    "light": "#C5AAFB",
+    "dark": "#001D56"
   },
   "navigation": {
     "groups": [
@@ -24,6 +26,9 @@
         ]
       }
     ]
+  },
+  "fonts": {
+    "family": "Instrument Sans"
   },
   "favicon": "/favicon.svg",
   "logo": {
