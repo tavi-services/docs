@@ -1,55 +1,27 @@
-# Mintlify Starter Kit
+# Tavi Partner API documentation
 
-Use the starter kit to get your docs deployed and ready to customize.
+Partner integration documentation hosted by Mintlify.
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+- Public site: https://tavi-services-limited.mintlify.site/
+- Dashboard: https://app.mintlify.com/tavi-services-limited/tavi-services-limited/publishes/overview
+- Source: six MDX pages, five SVG diagrams in `images/`, configuration in `docs.json`.
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+## Preview and validate
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
+Run these commands from this repository:
 
-## AI-assisted writing
-
-Set up your AI coding tool to work with Mintlify:
-
-```bash
-npx skills add https://mintlify.com/docs
+```sh
+npx --yes mint dev --port 10418
+npx --yes mint validate
+npx --yes mint broken-links
 ```
 
-This command installs Mintlify's documentation skill for your configured AI tools like Claude Code, Cursor, Windsurf, and others. The skill includes component reference, writing standards, and workflow guidance.
+## Publish
 
-See the [AI tools guides](/ai-tools) for tool-specific setup.
+Push documentation changes to `main`. Mintlify builds the connected branch automatically. Confirm a successful publish in the dashboard and check the public pages after each update.
 
-## Development
+## Editorial conventions
 
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
+Use generic partner terminology. Tavi contacts customers directly for routine questions and scheduling. Phone is required; email is optional. The partner receives key work-order updates through webhooks. Pricing aims for an agreed rate card, with approval for additional scope or spending. Keep the billing summary on the overview.
 
-```
-npm i -g mint
-```
-
-Run the following command at the root of your documentation, where your `docs.json` is located:
-
-```
-mint dev
-```
-
-View your local preview at `http://localhost:3000`.
-
-## Publishing changes
-
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
-
-## Need help?
-
-### Troubleshooting
-
-- If your dev environment isn't running: Run `mint update` to ensure you have the most recent version of the CLI.
-- If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
-
-### Resources
-- [Mintlify documentation](https://mintlify.com/docs)
+The API reference describes the integration contract under discussion. Do not add a live API host or interactive requests until partner access is ready.

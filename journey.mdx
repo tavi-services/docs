@@ -1,0 +1,25 @@
+---
+title: "Customer journey"
+description: "Who does what, from request to payment."
+---
+
+A resident can start with “the sink is leaking” and a photo. Your concierge gathers the address, customer phone number and available access details. Tavi contacts the customer directly to clarify the issue and identify the service needed. Use plain-language questions and explain the price before asking for approval.
+
+![The journey and the points where customer input is needed](/images/journey.svg)
+
+**Customer input:** describe the symptoms, share photos and access details, answer Tavi’s questions by phone or message, and review the result. The designated approver accepts the scope and price before paid work begins.
+
+**Your concierge's role:** submit the request and customer contact details, record spending decisions and maintain the work-order activity record. Use Tavi’s webhooks to show visit updates, photos, the work report and invoices.
+
+## When the job changes
+
+| Situation | Tavi does | Your concierge does |
+| --- | --- | --- |
+| Missing information | Contacts the customer directly for details | Supplies known customer and property information |
+| Reschedule / no access | Contacts the customer to arrange access or a new visit window | Shows the confirmed window from Tavi’s update |
+| Over the limit | Pauses additional work and sends priced options | Gets a decision from the person who approves spending and sends it to Tavi |
+| Not fixed | Reviews the issue and agrees a remedy or return visit | Records the customer's report against the original job and shows the resolution |
+| Cancellation requested | Confirms whether the job can be cancelled and any charges | Sends the request and shows the confirmed outcome |
+| Emergency / no technician | Escalates to a person under the agreed support policy | Shows the update and directs the customer to the agreed support contact |
+
+Keep key events, photos and spending decisions on the work-order activity record in your application.

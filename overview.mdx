@@ -1,0 +1,28 @@
+---
+title: "Tavi Partner API"
+description: "Maintenance fulfillment, inside your product."
+---
+
+Customers request maintenance through your concierge. Tavi contacts the customer directly to clarify the problem and coordinate the visit, arranges a technician and sends progress, photos and invoices to your application through webhooks.
+
+![Application and Tavi responsibilities](/images/architecture.svg)
+
+## How it works
+
+1. **Describe the problem.** The customer explains what they see and can share photos. Your concierge passes the request, location details and customer phone number to Tavi.
+2. **Approve the price.** Tavi proposes a rate-card service or a quote. Your concierge shows the scope and price and collects approval from the person responsible for spending.
+3. **Arrange the work.** Tavi contacts the customer directly to confirm details and access, and coordinates the technician. Webhooks keep your concierge’s work-order record current.
+4. **Review the result.** The customer sees the work report and photos, confirms the result or reports a problem. Tavi issues the invoice to the agreed payer.
+
+## Customer contact and updates
+
+Tavi handles routine questions and visit coordination by calling, texting or emailing the customer. Provide a phone number with every request; email is optional. Your application keeps the work-order activity record, including photos, approvals and service updates received through webhooks.
+
+## Pricing and billing
+
+We aim to agree a shared rate card covering routine services, prices and inclusions. Tavi provides a quote for work outside the rate card and gets approval before additional work or cost.
+
+> **Flexible billing.** We can adapt the billing arrangement to your workflow. During onboarding, we’ll agree who receives the invoice, how payment is collected and when payment is due.
+
+See the [customer journey](/journey), [pricing and approvals](/approvals), and [API reference](/api-reference).
+

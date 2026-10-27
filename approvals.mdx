@@ -1,0 +1,26 @@
+---
+title: "Pricing and approvals"
+description: "Rate-card services, quotes and spending decisions."
+---
+
+![Explicit authority and over-limit approval flow](/images/approval.svg)
+
+## Rate card or quote
+
+| Pricing path | Tavi provides | Approval needed |
+| --- | --- | --- |
+| Rate-card service | A matching service at the agreed price, with its inclusions and exclusions | Service scope and price |
+| Quoted work | A defined scope and quote for work outside the rate card | Scope and total price |
+| Diagnosis needed | A diagnostic visit and fee, followed by a repair quote | Diagnostic fee, then repair scope and price |
+| Scope or cost changes | An explanation and updated total before additional work | Changed scope and revised total |
+
+We aim to agree a shared rate card for routine services. The customer describes the problem; Tavi identifies the appropriate service. Your backend records the approved service or quote, its version and the decision. Agree who can authorize spending during onboarding.
+
+## Approve spending before work starts
+
+A not-to-exceed (NTE) limit authorizes a defined scope of work up to a maximum total. Get approval for changes to the scope or spending limit before carrying out the additional work. Use `quote_required` to request a quote before authorizing work. Include diagnostic fees in the authorization. Paid work starts after the designated approver accepts the scope and price. This also applies to emergency work.
+
+A quote decision identifies the **quote version, selected option, actor, time, evidence and new total authorized amount**. Reject stale or expired quotes. The new authorized total includes costs already incurred. Record the scope, amount and currency as structured fields.
+
+Record the customer’s review of the completed work. If the issue remains, Tavi reviews the report and arranges follow-up.
+

@@ -1,0 +1,29 @@
+---
+title: "Setup"
+description: "Decisions to agree before launch."
+---
+
+The **Partner** is the application or service integrating with Tavi. The **Customer** is the person or organization requesting work. The **Approver** authorizes spending. The **Payer** settles the invoice. These roles may belong to different parties.
+
+## Configure your integration
+
+| Area | Agree during onboarding |
+| --- | --- |
+| Customer identity | Stable customer and organization IDs; isolate access across organizations |
+| Service coverage | Share the locations and trades you need; confirm coverage with Tavi during setup |
+| Sites and units | Stable site IDs, optional unit IDs and customer contact details: phone required, email optional |
+| Pricing and approvals | Rate-card services, inclusions, diagnostic fees, quote approval, spending authority and optional PO references |
+| Billing | Billed entity, payer, payment method, fees, tax and settlement terms |
+| Customer communication | Tavi contacts the customer directly by phone or message; agree service hours and human escalation |
+| Concierge activity | Use webhooks to keep photos, approvals and work-order updates in your application |
+| Intake | Request description, location, customer phone number, trade and target date; Tavi clarifies the issue with the customer |
+| Completion | Work report, photos, customer review and follow-up |
+| Technical setup | Sandbox, scoped credentials, callback URL, signing, retries, limits and retention |
+
+## Locations and contacts
+
+Use a stable site reference. Where a site contains multiple units, keep unit identity separate from the occupant or contact. Group units under their building address. Include the customer’s phone number on every request; email is optional.
+
+## Test before launch
+
+Run representative jobs through intake, scheduling, approval, evidence, customer review and invoicing. Exercise duplicate requests, failed callbacks, cancellation, not-fixed reports and payment failures. Confirm service hours and support ownership before launch.

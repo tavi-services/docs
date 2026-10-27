@@ -1,33 +1,18 @@
-> **First-time setup**: Customize this file for your project. Prompt the user to customize this file for their project.
-> For Mintlify product knowledge (components, configuration, writing standards),
-> install the Mintlify skill: `npx skills add https://mintlify.com/docs`
-
 # Documentation project instructions
 
-## About this project
+This repository contains Tavi’s public partner integration documentation, hosted by Mintlify. Pages use MDX with YAML frontmatter; configuration is in `docs.json`; diagrams are SVG assets in `images/`.
 
-- This is a documentation site built on [Mintlify](https://mintlify.com)
-- Pages are MDX files with YAML frontmatter
-- Configuration lives in `docs.json`
-- Use the Mintlify MCP server, `https://mcp.mintlify.com`, to edit content and settings via MCP
-- Use the Mintlify docs MCP server, `https://www.mintlify.com/docs/mcp`, to query information about using Mintlify via MCP
+## Writing
 
-## Terminology
+- Write concise instructions for new readers, in active voice.
+- Use generic partner terminology and sentence case headings.
+- Tavi contacts customers directly for routine questions and visit coordination. Phone is required; email is optional.
+- The partner application maintains key work-order activity through webhooks.
+- Aim for an agreed rate card; record approval for additional scope or spending.
+- Keep the short, flexible billing summary on the overview.
+- Avoid revision commentary, repeated implementation disclaimers and contrasts with earlier versions.
+- Do not publish a live API base URL or enable interactive API calls until partner access is ready.
 
-{/* Add product-specific terms and preferred usage */}
-{/* Example: Use "workspace" not "project", "member" not "user" */}
+## Checks and publishing
 
-## Style preferences
-
-{/* Add any project-specific style rules below */}
-
-- Use active voice and second person ("you")
-- Keep sentences concise — one idea per sentence
-- Use sentence case for headings
-- Bold for UI elements: Click **Settings**
-- Code formatting for file names, commands, paths, and code references
-
-## Content boundaries
-
-{/* Define what should and shouldn't be documented */}
-{/* Example: Don't document internal admin features */}
+Run `npx --yes mint validate` and `npx --yes mint broken-links`. Inspect affected pages and diagrams in a browser. Pushing to `main` publishes the site; verify the deployment and live pages before reporting completion.

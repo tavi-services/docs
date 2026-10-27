@@ -1,0 +1,63 @@
+---
+title: "Webhooks and state"
+description: "Updates from Tavi to your app."
+---
+
+Webhooks are automatic updates **sent by Tavi to your backend** when something changes on a work order.
+
+1. **Tavi records a change** — for example, a technician is booked, work is reported complete, or an invoice is issued.
+2. **Tavi sends the update to your backend** — as JSON, to a webhook URL your team provides.
+3. **Your backend checks and saves it**, then updates the job information shown in your app.
+4. **Your customer sees the update** — for example, the confirmed visit window.
+
+![Updates flow from Tavi through your backend to your customer app](/images/events.svg)
+
+Tavi contacts the customer directly for routine questions and visit coordination. Webhooks keep your application’s activity record current. Your backend sends available information and spending decisions through the API. If an update is missing or arrives out of order, request the latest work-order details.
+
+| Event | What the partner shows or does |
+| --- | --- |
+| `work_order.received` | Request recorded for triage |
+| `question.created` | Record the question; provide information already held in your application |
+| `work_order.scheduled` | Display the current visit window; includes reschedules |
+| `work_order.in_progress` | Show reported arrival / clock-in |
+| `quote.needs_approval` | Present priced options to the authorized person |
+| `quote.decided` | Record the decision and current authorization |
+| `work_order.completed` | Show work report, photos and visit evidence; request customer review |
+| `completion.reviewed` | Record confirmed or not-fixed outcome |
+| `work_order.closed` | Record service close-out |
+| `invoice.created`, `payment.updated` | Reconcile invoice and settlement separately |
+| `message.created`, `issue.updated` | Update activity and next action |
+| `request.resolved`, `work_order.cancelled` | Show confirmed reschedule/cancellation outcome |
+| `work_order.updated` | Other status changes, reopening, contact or visit-evidence updates |
+
+`work_order.completed` records Tavi's report that work is complete. Customer confirmation and payment are tracked separately. Service states are `received`, `scheduled`, `in_progress`, `needs_approval`, `work_complete`, `closed` and `cancelled`. `received` means recorded for triage, before a technician is confirmed. A `next_action` identifies who needs to act and the related question, quote or issue. 
+
+```json
+{
+  "id": "evt_example_04",
+  "type": "work_order.scheduled",
+  "created_at": "2026-10-27T16:10:00Z",
+  "schema_version": "1",
+  "sequence": 4,
+  "data": {
+    "work_order_id": "11111111-1111-4111-8111-111111111111",
+    "external_id": "request-1048",
+    "status": "scheduled",
+    "visit": {
+      "scheduled_at": "2026-10-28T13:00:00Z",
+      "duration_minutes": 120,
+      "timezone": "America/New_York"
+    }
+  }
+}
+```
+
+## Delivery and recovery
+
+**Verify:** HMAC-SHA256 over `timestamp + "." + raw body`, with a key ID and signature header. Configure signature headers, replay tolerance and secret rotation during setup.
+
+**Deduplicate:** delivery is at least once. Use `id` to ignore repeats and a per-job `sequence` to detect gaps. Events may arrive out of order; older events must not regress the current UI.
+
+**Recover:** retry failed delivery with backoff; alert and offer replay when the delivery window expires. On gaps or uncertainty, GET the latest job. Polling remains a fallback. Replay retention and polling limits are onboarding decisions.
+
+Keep sensitive contact/access information out of webhook bodies where possible; fetch it through scoped reads. Separate sandbox and production secrets.
