@@ -18,7 +18,7 @@ npx --yes mint broken-links
 
 ## Publish
 
-Push documentation changes to `main`. Mintlify builds the connected branch automatically. Confirm a successful publish in the dashboard and check the public pages after each update.
+Push documentation changes to `main`. Check the dashboard for the connected branch build. If no build appears, click **Manual update** on the Publishes overview. Confirm a successful publish and check the public pages after each update.
 
 ## Editorial conventions
 
