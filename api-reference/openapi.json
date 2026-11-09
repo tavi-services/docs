@@ -1,0 +1,2246 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Tavi Client API",
+    "version": "1.0"
+  },
+  "paths": {
+    "/api/v1/jobs/client/": {
+      "post": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Create a work order",
+        "operationId": "create_job_from_client",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientJobCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientJobDetailResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No session and no X-Tavi-API-Key."
+          },
+          "403": {
+            "description": "Caller is an operator, the site is in another organization, or the caller isn't on the site's team."
+          },
+          "404": {
+            "description": "Site or equipment not found."
+          },
+          "400": {
+            "description": "The work order or site contact is invalid."
+          },
+          "409": {
+            "description": "The site contact's email or phone belongs to another account."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/client": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "List work orders",
+        "operationId": "list_jobs_for_client",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/JobStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by job status",
+              "title": "Status"
+            },
+            "description": "Only work orders in this status."
+          },
+          {
+            "name": "location_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by location ID",
+              "title": "Location Id"
+            },
+            "description": "Only work orders at this site."
+          },
+          {
+            "name": "asset_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter to work orders about one registered asset",
+              "title": "Asset Id"
+            },
+            "description": "Only work orders about this piece of equipment."
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "assigned",
+                "all"
+              ],
+              "type": "string",
+              "description": "Filter scope. 'assigned' (default) restricts to jobs at locations the caller is on the team for; 'all' returns every job in the org with `is_user_assigned` stamped per row. Drives the client portal's Mine / All toggle.",
+              "default": "assigned",
+              "title": "Scope"
+            },
+            "description": "'assigned' (default): work orders at sites your account is on the team for. 'all': every work order in your organization."
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of items to skip",
+              "default": 0,
+              "title": "Skip"
+            },
+            "description": "Number of items to skip"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 2000,
+              "minimum": 1,
+              "description": "Number of items to return (max 2000)",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "Number of items to return (max 2000)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_ClientJobResponse_"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No session and no X-Tavi-API-Key."
+          },
+          "403": {
+            "description": "The API key is unknown, revoked, or its holder is deactivated or may not use this API."
+          },
+          "404": {
+            "description": "An X-Tavi-API-Key was sent but platform API keys are not enabled on this backend."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/client/{job_id}": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Get a work order",
+        "operationId": "get_job_for_client",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientJobDetailResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No session and no X-Tavi-API-Key."
+          },
+          "403": {
+            "description": "The API key is unknown, revoked, or its holder is deactivated or may not use this API."
+          },
+          "404": {
+            "description": "An X-Tavi-API-Key was sent but platform API keys are not enabled on this backend."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/attachments/upload/job/{job_id}": {
+      "post": {
+        "tags": [
+          "attachments"
+        ],
+        "summary": "Upload a photo or file",
+        "operationId": "upload_job_attachment",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_job_attachment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No session and no X-Tavi-API-Key."
+          },
+          "403": {
+            "description": "The API key is unknown, revoked, or its holder is deactivated or may not use this API."
+          },
+          "404": {
+            "description": "An X-Tavi-API-Key was sent but platform API keys are not enabled on this backend."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/locations/client/": {
+      "post": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "Create a site",
+        "operationId": "create_location_from_client",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientLocationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No session and no X-Tavi-API-Key."
+          },
+          "403": {
+            "description": "The API key is unknown, revoked, or its holder is deactivated or may not use this API."
+          },
+          "404": {
+            "description": "An X-Tavi-API-Key was sent but platform API keys are not enabled on this backend."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/locations/": {
+      "get": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "List sites",
+        "operationId": "list_locations",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of items to skip",
+              "default": 0,
+              "title": "Skip"
+            },
+            "description": "Number of items to skip"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 2000,
+              "minimum": 1,
+              "description": "Number of items to return (max 2000)",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "Number of items to return (max 2000)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_LocationResponse_"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No session and no X-Tavi-API-Key."
+          },
+          "403": {
+            "description": "The API key is unknown, revoked, or its holder is deactivated or may not use this API."
+          },
+          "404": {
+            "description": "An X-Tavi-API-Key was sent but platform API keys are not enabled on this backend."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trades/": {
+      "get": {
+        "tags": [
+          "trades"
+        ],
+        "summary": "List trades",
+        "operationId": "list_trades",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array",
+                  "title": "Response List Trades"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AssetSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "asset_type": {
+            "type": "string",
+            "title": "Asset Type"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "manufacturer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Manufacturer"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "serial_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Serial Number"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "asset_type"
+        ],
+        "title": "AssetSummary"
+      },
+      "Body_upload_job_attachment": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_job_attachment"
+      },
+      "ChangeOrderReadResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "submitted_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted By Name"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "message_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Message Id"
+          },
+          "attachments": {
+            "items": {
+              "$ref": "#/components/schemas/FileResponse"
+            },
+            "type": "array",
+            "title": "Attachments",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "content",
+          "submitted_by_name",
+          "created_at",
+          "message_id"
+        ],
+        "title": "ChangeOrderReadResponse"
+      },
+      "ClientAwardedOption": {
+        "properties": {
+          "quoted_price_dollars": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quoted Price Dollars"
+          },
+          "pre_tax_amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pre Tax Amount"
+          },
+          "tax_amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tax Amount"
+          },
+          "has_insurance": {
+            "type": "boolean",
+            "title": "Has Insurance",
+            "default": false
+          },
+          "has_w9": {
+            "type": "boolean",
+            "title": "Has W9",
+            "default": false
+          },
+          "has_license": {
+            "type": "boolean",
+            "title": "Has License",
+            "default": false
+          },
+          "has_references": {
+            "type": "boolean",
+            "title": "Has References",
+            "default": false
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "payment_terms": {
+            "items": {
+              "$ref": "#/components/schemas/ClientPaymentTranche"
+            },
+            "type": "array",
+            "title": "Payment Terms",
+            "default": []
+          }
+        },
+        "type": "object",
+        "title": "ClientAwardedOption",
+        "description": "The option that was awarded, with its price and payment schedule."
+      },
+      "ClientJobCreateRequest": {
+        "properties": {
+          "location_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Location Id"
+          },
+          "trade": {
+            "type": "string",
+            "title": "Trade"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "deadline_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Deadline Date"
+          },
+          "price_dne_requirement": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Dne Requirement"
+          },
+          "attachments": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/FileRegisterRequest"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attachments"
+          },
+          "client_owner_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Owner User Id"
+          },
+          "asset_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asset Ids"
+          },
+          "site_contact": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClientSiteContactCreateRequest"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The on-site contact Tavi coordinates the visit with. Matched by phone to an existing contact in your organization, or created, and added to the site's team. Use instead of client_owner_user_id."
+          },
+          "context": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context",
+            "description": "Anything else Tavi should know: an escalation contact for approvals, access instructions, or customer specifics. Shown to Tavi alongside the description."
+          }
+        },
+        "type": "object",
+        "required": [
+          "location_id",
+          "trade",
+          "description",
+          "deadline_date"
+        ],
+        "title": "ClientJobCreateRequest",
+        "description": "A new work order."
+      },
+      "ClientJobDetailResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Organization Id"
+          },
+          "trade": {
+            "type": "string",
+            "title": "Trade"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "job_status": {
+            "$ref": "#/components/schemas/JobStatus"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "location": {
+            "$ref": "#/components/schemas/LocationSummary"
+          },
+          "is_user_assigned": {
+            "type": "boolean",
+            "title": "Is User Assigned",
+            "default": false
+          },
+          "chat_unread_count": {
+            "type": "integer",
+            "title": "Chat Unread Count",
+            "default": 0
+          },
+          "last_message_preview": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Message Preview"
+          },
+          "last_message_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Message At"
+          },
+          "client_owner_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Owner User Id"
+          },
+          "client_owner_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Owner Name"
+          },
+          "assets": {
+            "items": {
+              "$ref": "#/components/schemas/AssetSummary"
+            },
+            "type": "array",
+            "title": "Assets",
+            "default": []
+          },
+          "deadline_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Deadline Date"
+          },
+          "is_emergency": {
+            "type": "boolean",
+            "title": "Is Emergency"
+          },
+          "price_dne_requirement": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Dne Requirement"
+          },
+          "attachments": {
+            "items": {
+              "$ref": "#/components/schemas/FileResponse"
+            },
+            "type": "array",
+            "title": "Attachments",
+            "default": []
+          },
+          "pipeline": {
+            "$ref": "#/components/schemas/ClientOptionPipeline"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/ClientOptionSummary"
+            },
+            "type": "array",
+            "title": "Options",
+            "default": []
+          },
+          "has_dispatched_option": {
+            "type": "boolean",
+            "title": "Has Dispatched Option",
+            "default": false
+          },
+          "awarded_options": {
+            "items": {
+              "$ref": "#/components/schemas/ClientAwardedOption"
+            },
+            "type": "array",
+            "title": "Awarded Options",
+            "default": []
+          },
+          "visits": {
+            "items": {
+              "$ref": "#/components/schemas/ClientJobVisitReadResponse"
+            },
+            "type": "array",
+            "title": "Visits",
+            "default": []
+          },
+          "recurrence": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JobRecurrenceReadResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "change_orders": {
+            "items": {
+              "$ref": "#/components/schemas/ChangeOrderReadResponse"
+            },
+            "type": "array",
+            "title": "Change Orders",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "organization_id",
+          "trade",
+          "job_status",
+          "created_at",
+          "location",
+          "deadline_date",
+          "is_emergency",
+          "pipeline"
+        ],
+        "title": "ClientJobDetailResponse",
+        "description": "A work order with its sourcing progress, quotes, visits and sign-off evidence. Subcontractor identities are never included; Tavi is the contracted provider."
+      },
+      "ClientJobResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Organization Id"
+          },
+          "trade": {
+            "type": "string",
+            "title": "Trade"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "job_status": {
+            "$ref": "#/components/schemas/JobStatus"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "location": {
+            "$ref": "#/components/schemas/LocationSummary"
+          },
+          "is_user_assigned": {
+            "type": "boolean",
+            "title": "Is User Assigned",
+            "default": false
+          },
+          "chat_unread_count": {
+            "type": "integer",
+            "title": "Chat Unread Count",
+            "default": 0
+          },
+          "last_message_preview": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Message Preview"
+          },
+          "last_message_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Message At"
+          },
+          "client_owner_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Owner User Id"
+          },
+          "client_owner_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Owner Name"
+          },
+          "assets": {
+            "items": {
+              "$ref": "#/components/schemas/AssetSummary"
+            },
+            "type": "array",
+            "title": "Assets",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "organization_id",
+          "trade",
+          "job_status",
+          "created_at",
+          "location"
+        ],
+        "title": "ClientJobResponse",
+        "description": "A work order as it appears in a list."
+      },
+      "ClientJobVisitReadResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "site_visit",
+              "work_event"
+            ],
+            "title": "Kind"
+          },
+          "option_alias": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Option Alias"
+          },
+          "scheduled_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Scheduled At"
+          },
+          "duration_minutes": {
+            "type": "integer",
+            "title": "Duration Minutes"
+          },
+          "is_all_day": {
+            "type": "boolean",
+            "title": "Is All Day",
+            "default": false
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "scheduled",
+              "completed",
+              "not_finished"
+            ],
+            "title": "Status"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "clocked_in_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clocked In At"
+          },
+          "clocked_out_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clocked Out At"
+          },
+          "signed_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signed By Name"
+          },
+          "signature": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FileResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "photos": {
+            "items": {
+              "$ref": "#/components/schemas/FileResponse"
+            },
+            "type": "array",
+            "title": "Photos",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "scheduled_at",
+          "duration_minutes",
+          "status"
+        ],
+        "title": "ClientJobVisitReadResponse",
+        "description": "A site visit or work visit, with arrival and departure times, who signed off, and sign-off photos."
+      },
+      "ClientLocationCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "address_line_1": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Address Line 1"
+          },
+          "address_line_2": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Line 2"
+          },
+          "city": {
+            "type": "string",
+            "minLength": 1,
+            "title": "City"
+          },
+          "state": {
+            "type": "string",
+            "minLength": 1,
+            "title": "State"
+          },
+          "postal_code": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Postal Code"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Country"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": "US"
+          },
+          "organization_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organization Id"
+          },
+          "assigned_user_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigned User Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "address_line_1",
+          "city",
+          "state",
+          "postal_code"
+        ],
+        "title": "ClientLocationCreate",
+        "description": "A new site. Tavi geocodes the address."
+      },
+      "ClientOptionPipeline": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "vetted": {
+            "type": "integer",
+            "title": "Vetted"
+          },
+          "contacted": {
+            "type": "integer",
+            "title": "Contacted"
+          },
+          "responded": {
+            "type": "integer",
+            "title": "Responded"
+          },
+          "site_visits": {
+            "type": "integer",
+            "title": "Site Visits"
+          },
+          "bids": {
+            "type": "integer",
+            "title": "Bids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "vetted",
+          "contacted",
+          "responded",
+          "site_visits",
+          "bids"
+        ],
+        "title": "ClientOptionPipeline",
+        "description": "How many providers Tavi has vetted, contacted, heard from, visited and received bids from."
+      },
+      "ClientOptionSummary": {
+        "properties": {
+          "alias": {
+            "type": "string",
+            "title": "Alias"
+          },
+          "funnel_state": {
+            "type": "string",
+            "title": "Funnel State"
+          },
+          "quoted_price_dollars": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quoted Price Dollars"
+          },
+          "pre_tax_amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pre Tax Amount"
+          },
+          "tax_amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tax Amount"
+          },
+          "scope_of_work": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope Of Work"
+          },
+          "has_site_visit": {
+            "type": "boolean",
+            "title": "Has Site Visit",
+            "default": false
+          },
+          "has_bid": {
+            "type": "boolean",
+            "title": "Has Bid",
+            "default": false
+          },
+          "has_insurance": {
+            "type": "boolean",
+            "title": "Has Insurance",
+            "default": false
+          },
+          "has_w9": {
+            "type": "boolean",
+            "title": "Has W9",
+            "default": false
+          },
+          "has_license": {
+            "type": "boolean",
+            "title": "Has License",
+            "default": false
+          },
+          "has_references": {
+            "type": "boolean",
+            "title": "Has References",
+            "default": false
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "is_recommended": {
+            "type": "boolean",
+            "title": "Is Recommended",
+            "default": false
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "approved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved At"
+          },
+          "is_approvable": {
+            "type": "boolean",
+            "title": "Is Approvable",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "alias",
+          "funnel_state"
+        ],
+        "title": "ClientOptionSummary",
+        "description": "One anonymized provider option and its quote, once published."
+      },
+      "ClientPaymentTranche": {
+        "properties": {
+          "tranche_index": {
+            "type": "integer",
+            "title": "Tranche Index"
+          },
+          "tranche_name": {
+            "type": "string",
+            "title": "Tranche Name"
+          },
+          "tranche_percent": {
+            "type": "number",
+            "title": "Tranche Percent"
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "accounts_payable_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accounts Payable Days"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "payment_received": {
+            "type": "boolean",
+            "title": "Payment Received",
+            "default": false
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/FileResponse"
+            },
+            "type": "array",
+            "title": "Files",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "tranche_index",
+          "tranche_name",
+          "tranche_percent"
+        ],
+        "title": "ClientPaymentTranche"
+      },
+      "ClientSiteContactCreateRequest": {
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "phone": {
+            "type": "string",
+            "title": "Phone",
+            "description": "Mobile number; Tavi calls and texts it."
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "email"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "first_name",
+          "phone"
+        ],
+        "title": "ClientSiteContactCreateRequest",
+        "description": "The person at the site Tavi coordinates the visit with."
+      },
+      "Country": {
+        "type": "string",
+        "enum": [
+          "US",
+          "CA"
+        ],
+        "title": "Country"
+      },
+      "FileCategory": {
+        "type": "string",
+        "enum": [
+          "INSURANCE_CERTIFICATE",
+          "W9",
+          "CONTRACTORS_LICENSE",
+          "ONBOARDING_SIGNATURE",
+          "EXECUTED_MSA",
+          "VENDOR_FAVICON",
+          "VENDOR_AGREEMENT",
+          "CUSTOMER_AGREEMENT",
+          "SIGNED_VENDOR_AGREEMENT",
+          "REMOVED_SIGNED_VENDOR_AGREEMENT",
+          "SUPERSEDED_SIGNED_VENDOR_AGREEMENT",
+          "CUSTOMER_APPROVAL_PROOF",
+          "PORTAL_CAP_VERIFICATION",
+          "BEST_AND_FINAL_PROOF",
+          "PROPERTY_MANAGER_DOCUMENT",
+          "APPROVED_VENDOR_LIST",
+          "JOB_ATTACHMENT",
+          "MESSAGE_ATTACHMENT",
+          "INTERNAL_MESSAGE_ATTACHMENT",
+          "JOB_AGENT_CHAT",
+          "ASSET_PHOTO",
+          "QUOTE",
+          "VENDOR_NTE_INVOICE",
+          "BALANCE_INVOICE",
+          "TRANCHE_INVOICE",
+          "TAVI_QUOTE",
+          "QUALITY_VERIFICATION",
+          "PAYMENT_PROOF",
+          "SIGNOFF_PHOTO",
+          "SIGNOFF_BEFORE_PHOTO",
+          "SIGNOFF_SIGNATURE",
+          "ORGANIZATION_LOGO",
+          "SCREENING_RECORDING",
+          "CALL_RECORDING",
+          "TRADE_EXPERT_RECORDING",
+          "OTHER"
+        ],
+        "title": "FileCategory"
+      },
+      "FileRegisterRequest": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "content_type": {
+            "type": "string",
+            "title": "Content Type"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "title": "Size Bytes"
+          },
+          "storage_path": {
+            "type": "string",
+            "title": "Storage Path"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "content_type",
+          "size_bytes",
+          "storage_path"
+        ],
+        "title": "FileRegisterRequest"
+      },
+      "FileResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/FileCategory"
+            },
+            "type": "array",
+            "title": "Categories"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "content_type": {
+            "type": "string",
+            "title": "Content Type"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "title": "Size Bytes"
+          },
+          "storage_path": {
+            "type": "string",
+            "title": "Storage Path"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "download_url": {
+            "type": "string",
+            "title": "Download Url",
+            "description": "Link to the file's content. Works without an API key and stays valid for at least 30 days; read the work order again for a fresh link.",
+            "readOnly": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "categories",
+          "name",
+          "content_type",
+          "size_bytes",
+          "storage_path",
+          "created_at",
+          "download_url"
+        ],
+        "title": "FileResponse",
+        "description": "A stored photo or file. download_url works without an API key for at least 30 days."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "JobRecurrenceReadResponse": {
+        "properties": {
+          "frequency": {
+            "$ref": "#/components/schemas/RecurrenceFrequency"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "is_flexible_window": {
+            "type": "boolean",
+            "title": "Is Flexible Window"
+          },
+          "next_visit_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Visit Date"
+          },
+          "next_visit_last_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Visit Last Date"
+          },
+          "is_open": {
+            "type": "boolean",
+            "title": "Is Open"
+          }
+        },
+        "type": "object",
+        "required": [
+          "frequency",
+          "start_date",
+          "end_date",
+          "is_flexible_window",
+          "next_visit_date",
+          "next_visit_last_date",
+          "is_open"
+        ],
+        "title": "JobRecurrenceReadResponse"
+      },
+      "JobStatus": {
+        "type": "string",
+        "enum": [
+          "DRAFT",
+          "ACTIVE",
+          "SETTLEMENT",
+          "COMPLETED",
+          "CANCELLED"
+        ],
+        "title": "JobStatus",
+        "description": "DRAFT: received, Tavi is reviewing it. ACTIVE: Tavi is sourcing, scheduling or doing the work. SETTLEMENT: work done, payment processing. COMPLETED: closed. CANCELLED: cancelled."
+      },
+      "LocationResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Organization Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "address_line_1": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Line 1"
+          },
+          "address_line_2": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Line 2"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          },
+          "postal_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Postal Code"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Country"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lati": {
+            "type": "number",
+            "title": "Lati"
+          },
+          "long": {
+            "type": "number",
+            "title": "Long"
+          },
+          "timezone": {
+            "type": "string",
+            "title": "Timezone"
+          },
+          "servicechannel_location_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Servicechannel Location Id"
+          },
+          "location_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Notes"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "is_user_assigned": {
+            "type": "boolean",
+            "title": "Is User Assigned",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "organization_id",
+          "name",
+          "lati",
+          "long",
+          "timezone",
+          "created_at"
+        ],
+        "title": "LocationResponse",
+        "description": "A site."
+      },
+      "LocationSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "address_line_1": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Line 1"
+          },
+          "address_line_2": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Line 2"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          },
+          "postal_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Postal Code"
+          },
+          "timezone": {
+            "type": "string",
+            "title": "Timezone"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "timezone"
+        ],
+        "title": "LocationSummary",
+        "description": "The site a work order is at."
+      },
+      "PaginatedResponse_ClientJobResponse_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ClientJobResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "skip",
+          "limit"
+        ],
+        "title": "PaginatedResponse[ClientJobResponse]"
+      },
+      "PaginatedResponse_LocationResponse_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LocationResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "skip",
+          "limit"
+        ],
+        "title": "PaginatedResponse[LocationResponse]"
+      },
+      "RecurrenceFrequency": {
+        "type": "string",
+        "enum": [
+          "WEEKLY",
+          "BIWEEKLY",
+          "MONTHLY"
+        ],
+        "title": "RecurrenceFrequency"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Tavi-API-Key"
+      }
+    }
+  }
+}

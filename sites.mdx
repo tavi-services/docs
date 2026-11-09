@@ -1,0 +1,34 @@
+---
+title: "Sites"
+description: "Create and list the places work happens."
+---
+
+Every work order is at a site. Create each site once and keep its `id` alongside your own record for it.
+
+## Create a site
+
+```bash
+curl -X POST "$TAVI_API/api/v1/locations/client/" \
+  -H "X-Tavi-API-Key: $TAVI_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Store 104 - Austin",
+    "address_line_1": "1200 S Lamar Blvd",
+    "city": "Austin",
+    "state": "TX",
+    "postal_code": "78704"
+  }'
+```
+
+`name`, `address_line_1`, `city`, `state` and `postal_code` are required; `address_line_2` and `country` are optional. Tavi geocodes the address and sets the site's time zone. The new site joins your key's team, so you can file work orders there straight away.
+
+Each call creates a new site. Look up your existing sites before creating one to avoid duplicates.
+
+## List sites
+
+```bash
+curl "$TAVI_API/api/v1/locations/?limit=100" \
+  -H "X-Tavi-API-Key: $TAVI_KEY"
+```
+
+Results are paginated with `skip` and `limit`. `total` is the number of sites in your organization. `is_user_assigned` is `true` for sites on your key's team, where you can file work orders.

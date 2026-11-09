@@ -1,0 +1,28 @@
+---
+title: "Errors"
+description: "Status codes and what to do about them."
+---
+
+Errors return a JSON body with a `detail` field explaining the problem.
+
+| Status | Meaning | What to do |
+| --- | --- | --- |
+| `400` | The request is invalid, for example a phone number Tavi can't use. | Fix the request. |
+| `401` | No API key was sent. | Send `X-Tavi-API-Key`. |
+| `403` | The key is unknown, revoked or expired; it can't use this endpoint; or the site isn't on your key's team. | Check the key and the site. |
+| `404` | The work order or site doesn't exist, or belongs to another organization. | Check the id. |
+| `409` | The site contact's phone or email belongs to another organization's account. | Use a different contact, or contact your Tavi team. |
+| `422` | A field is missing or has the wrong type. `detail` lists each problem. | Fix the listed fields. |
+| `5xx` | Something went wrong at Tavi. | Retry with backoff. Before retrying a create, check whether the work order was filed. |
+
+A `403` for a site outside your key's team has a structured `detail`:
+
+```json
+{
+  "detail": {
+    "code": "no_location_access",
+    "entity_type": "location",
+    "entity_id": "6f1c2a8e-3b7d-4c55-9a51-0f2a1e9c7b10"
+  }
+}
+```

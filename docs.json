@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Tavi Partner API",
+  "name": "Tavi Client API",
   "colors": {
     "primary": "#001D56",
     "light": "#C5AAFB",
@@ -10,22 +10,27 @@
   "navigation": {
     "groups": [
       {
-        "group": "Documentation",
-        "pages": [
-          "overview",
-          "journey",
-          "api-reference",
-          "events",
-          "approvals"
-        ]
+        "group": "Get started",
+        "pages": ["overview", "quickstart", "authentication"]
       },
       {
-        "group": "Integration guides",
-        "pages": [
-          "integration-configuration"
-        ]
+        "group": "Guides",
+        "pages": ["sites", "work-orders", "tracking", "errors"]
+      },
+      {
+        "group": "Trust",
+        "pages": ["security"]
+      },
+      {
+        "group": "API reference",
+        "openapi": "api-reference/openapi.json"
       }
     ]
+  },
+  "api": {
+    "playground": {
+      "display": "none"
+    }
   },
   "fonts": {
     "family": "Instrument Sans"
@@ -36,13 +41,11 @@
     "dark": "/logo/dark.svg"
   },
   "redirects": [
-    {
-      "source": "/index",
-      "destination": "/overview"
-    },
-    {
-      "source": "/quickstart",
-      "destination": "/overview"
-    }
+    { "source": "/index", "destination": "/overview" },
+    { "source": "/api-reference", "destination": "/work-orders" },
+    { "source": "/journey", "destination": "/overview" },
+    { "source": "/events", "destination": "/tracking" },
+    { "source": "/approvals", "destination": "/work-orders" },
+    { "source": "/integration-configuration", "destination": "/authentication" }
   ]
 }
