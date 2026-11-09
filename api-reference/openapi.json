@@ -52,7 +52,7 @@
             "description": "The work order or site contact is invalid."
           },
           "409": {
-            "description": "The site contact's email or phone belongs to another account."
+            "description": "The site contact's phone belongs to another account."
           },
           "422": {
             "description": "Validation Error",
@@ -1651,18 +1651,6 @@
             "type": "string",
             "title": "Phone",
             "description": "Mobile number; Tavi calls and texts it."
-          },
-          "email": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "email"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Email"
           }
         },
         "type": "object",

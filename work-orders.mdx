@@ -29,12 +29,11 @@ The response is the new work order in the same shape as [reading a work order](/
 "site_contact": {
   "first_name": "Dana",
   "last_name": "Lee",
-  "phone": "+15125550142",
-  "email": "dana@example.com"
+  "phone": "+15125550142"
 }
 ```
 
-`first_name` and `phone` are required. Tavi matches the phone number to a contact already in your organization, or creates one, and adds them to the site's team. They become the work order's lead contact.
+`first_name` and `phone` are required. Tavi matches the phone number to a contact already in your organization, or creates one, and adds them to the site's team. They become the work order's lead contact. A contact created this way has no Tavi sign-in.
 
 Tavi contacts them by phone and text about the visit, and they can reply STOP to opt out of texts. A phone number that belongs to another organization's contact returns `409`.
 
