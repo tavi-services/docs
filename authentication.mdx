@@ -1,0 +1,36 @@
+---
+title: "Authentication"
+description: "API keys and what they can reach."
+---
+
+Send your key in the `X-Tavi-API-Key` header on every request:
+
+```bash
+curl "$TAVI_API/api/v1/jobs/client" -H "X-Tavi-API-Key: $TAVI_KEY"
+```
+
+Call the API from your backend only. Never put the key in a browser, mobile app or source repository.
+
+## What a key can reach
+
+Each key belongs to one integration account inside one organization. It reaches the endpoints on this site and nothing else. Within them, it sees only its own organization's sites and work orders, and it can file work orders only at sites on its team. A site you create with the key joins its team automatically.
+
+If you file work for several customers, each customer is its own organization with its own key.
+
+## Lifetime and rotation
+
+- Tavi shows a key once, when it's issued. Tavi stores only a hash of it.
+- A key can be issued with an expiry date. Ask your Tavi team.
+- An account can hold two keys at once, so you can switch to a new key before the old one is revoked.
+- A revoked or expired key stops working on the next request.
+
+To rotate or revoke a key, contact your Tavi team.
+
+## Errors
+
+| Status | Meaning |
+| --- | --- |
+| `401` | No key was sent. |
+| `403` | The key is unknown, revoked or expired, or it can't use this endpoint. |
+
+See [errors](/errors) for the rest.

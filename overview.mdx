@@ -1,28 +1,32 @@
 ---
-title: "Tavi Partner API"
-description: "Maintenance fulfillment, inside your product."
+title: "Tavi Client API"
+description: "File maintenance work orders with Tavi and follow them to completion."
 ---
 
-Customers request maintenance through your concierge. Tavi contacts the customer directly to clarify the problem and coordinate the visit, arranges a technician and sends progress, photos and invoices to your application through webhooks.
+Tavi handles commercial maintenance for multi-site businesses: plumbing, electrical, HVAC, handyman and locksmith work. You send Tavi a work order. Tavi triages it, finds and vets a provider, agrees the price, schedules the visit, coordinates with the people on site, and pays the provider. You read the work order back at any time to see where it stands.
 
-![Application and Tavi responsibilities](/images/architecture.svg)
+![Your platform files work orders and reads their status; Tavi coordinates the visit with the on-site contact](/images/architecture.svg)
 
 ## How it works
 
-1. **Describe the problem.** The customer explains what they see and can share photos. Your concierge passes the request, location details and customer phone number to Tavi.
-2. **Approve the price.** Tavi proposes a rate-card service or a quote. Your concierge shows the scope and price and collects approval from the person responsible for spending.
-3. **Arrange the work.** Tavi contacts the customer directly to confirm details and access, and coordinates the technician. Webhooks keep your concierge’s work-order record current.
-4. **Review the result.** The customer sees the work report and photos, confirms the result or reports a problem. Tavi issues the invoice to the agreed payer.
+1. **Add your sites.** Create each site once with its address, or let Tavi set them up for you during onboarding.
+2. **File a work order.** Send the site, the trade, a description of the problem, a deadline and a do-not-exceed price. Name the on-site contact Tavi should call or text.
+3. **Tavi does the work.** Tavi sources and vets providers, collects quotes, schedules the visit and coordinates directly with the on-site contact by phone and text.
+4. **Follow progress.** Read the work order to see its status, sourcing progress, quoted price, scheduled visits and, when the work is done, the on-site sign-off with photos.
 
-## Customer contact and updates
+## What the API covers
 
-Tavi handles routine questions and visit coordination by calling, texting or emailing the customer. Provide a phone number with every request; email is optional. Your application keeps the work-order activity record, including photos, approvals and service updates received through webhooks.
+| You can | Endpoint |
+| --- | --- |
+| Create and list sites | `POST /api/v1/locations/client/`, `GET /api/v1/locations/` |
+| File a work order | `POST /api/v1/jobs/client/` |
+| Add photos or files to a work order | `POST /api/v1/attachments/upload/job/{job_id}` |
+| List work orders | `GET /api/v1/jobs/client` |
+| Read one work order in full | `GET /api/v1/jobs/client/{job_id}` |
+| List the trades Tavi accepts | `GET /api/v1/trades/` |
 
-## Pricing and billing
+Start with the [quickstart](/quickstart).
 
-We aim to agree a shared rate card covering routine services, prices and inclusions. Tavi provides a quote for work outside the rate card and gets approval before additional work or cost.
+## Billing
 
-> **Flexible billing.** We can adapt the billing arrangement to your workflow. During onboarding, we’ll agree who receives the invoice, how payment is collected and when payment is due.
-
-See the [customer journey](/journey), [pricing and approvals](/approvals), and [API reference](/api-reference).
-
+Your Tavi team agrees how invoices are sent and paid during onboarding, along with who approves spending above your do-not-exceed price.

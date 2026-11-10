@@ -1,0 +1,79 @@
+---
+title: "Security and compliance"
+description: "How Tavi protects your data and your customers' data."
+---
+
+Tavi runs maintenance for national multi-site brands, so we handle customer locations, contacts and spend data every day. We treat security as part of the product: we design controls into the platform, enforce them in code and test them on every change.
+
+## Infrastructure
+
+Tavi runs entirely on established cloud providers that undergo independent SOC 2 audits. We don't operate our own data centers or servers.
+
+| Component | Provider | Region |
+| --- | --- | --- |
+| API and application servers | Fly.io | US East (Virginia) |
+| Database and file storage | Supabase on AWS | US East (us-east-1) |
+| Web applications | Vercel | US East (Virginia) |
+| Agent runtime | Cloudflare Workers | Global edge, read-only database access |
+| Off-site backups | AWS S3 | US West (Oregon) |
+
+All customer data is stored in the United States.
+
+## Encryption
+
+- **In transit.** All traffic uses TLS. The API forces HTTPS and sends HSTS with a two-year lifetime, `includeSubDomains` and `preload`. Internal database connections also require TLS.
+- **At rest.** The database and file storage are encrypted at rest by our hosting provider. We add application-level encryption to the most sensitive credentials we hold, such as banking connection tokens.
+- **Backups.** We encrypt backups with a customer-managed AWS KMS key. Only a dedicated restore role can decrypt them, and that role requires multi-factor authentication.
+
+## Access control
+
+- **API keys.** Partner API keys are 256-bit random secrets. We store only a SHA-256 hash, show the key once at creation and never log it. Keys can expire, and you can revoke them at any time; a revocation takes effect on the next request. Deactivating an account revokes all of its keys automatically.
+- **Least privilege.** A key acts only as the account it was issued to and never grants more than that account could do in the Tavi app. Partner keys are limited to their own organization and the client endpoints documented here.
+- **Tenant isolation.** Every request is scoped to the caller's organization, and within it to the sites the caller is assigned to. A request for another organization's record returns the same `404` as a record that doesn't exist, so the API never reveals whether data exists.
+- **Default deny.** Every API endpoint must declare an access policy. An automated test fails the build if any endpoint lacks one, or if a public endpoint lacks a written justification.
+- **User sign-in.** People sign in with email one-time codes or Google and Microsoft single sign-on. Tokens are verified against pinned algorithms, audience and issuer on every request. Code requests are rate limited.
+
+## Application security
+
+- **Signed webhooks.** We verify the cryptographic signature of every inbound webhook from our telephony, email, payments and work-order providers before we process it. If verification can't run, the request is rejected.
+- **Hardened responses.** The API sends `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` and a strict referrer policy. Cross-origin requests are allowed only from Tavi's own domains.
+- **Secure coding standards.** Our written engineering standards ban hard-coded secrets, secrets in logs, unsafe deserialization and SQL built from strings. They also require escaping user text in every outbound channel and sanitizing rendered HTML.
+- **Data minimization.** API responses include only what the client needs. Internal margins, operator notes and subcontractor identities are never returned to clients.
+
+## Secrets management
+
+We keep production secrets in a dedicated secrets manager (Infisical) and sync them to our hosting environments. Secrets never appear in source code. Our deployment pipeline authenticates to AWS with short-lived OIDC credentials, not stored keys. Development environments are blocked from writing to production systems by an automated guard, and a test enforces that guard.
+
+## Change management
+
+- Every change goes through a pull request and a merge queue.
+- Continuous integration runs formatting, linting, type checks and the full automated test suite on every change before it can merge.
+- Production deploys only from commits that passed CI in the merge queue, and every deploy is pinned to an exact commit, so we always know what is running.
+- We scan infrastructure-as-code for misconfiguration with Checkov.
+
+## Monitoring and audit
+
+- Application errors are monitored in real time with Sentry, and our error reporting excludes local variables and personal data.
+- A database-level audit trail records every change to key business records, including the value before and after, regardless of how the change was made.
+- Administrative account actions, such as creating users, changing roles and minting or revoking keys, are logged with who did what and when.
+- We record when each API key was last used, so unused credentials are easy to find and revoke.
+
+## Backups and recovery
+
+We take a full database and file-storage backup every day and copy it to a separate AWS account in a different region. Backups are encrypted and write-only for the process that creates them. The pipeline can't read or delete existing backups, so a compromised pipeline can't destroy them. We keep database backups for a year.
+
+## AI and human oversight
+
+Tavi uses large language models through commercial API agreements to draft messages, triage requests and coordinate work. People stay in control:
+
+- A person reviews and approves every agent action that reaches a customer or moves money.
+- Customers can require that only named approvers send messages for their organization.
+- Agent trace data is deleted after 30 days, and message bodies are removed from it after 3 days.
+
+## Payments
+
+We don't store card numbers. Vendor payouts run through our banking partner's bill-pay platform, where vendors enter their own bank details. People approve each payment in that platform.
+
+## Communications compliance
+
+Text messaging honors carrier opt-out keywords (STOP, UNSUBSCRIBE, CANCEL, END, QUIT) and carrier-level opt-outs automatically. Every send passes through a single eligibility check. Customer texts include opt-out instructions.

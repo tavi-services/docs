@@ -1,0 +1,82 @@
+---
+title: "Tracking work orders"
+description: "Statuses, progress, quotes, visits and sign-off."
+---
+
+## Read a work order
+
+```bash
+curl "$TAVI_API/api/v1/jobs/client/$JOB_ID" \
+  -H "X-Tavi-API-Key: $TAVI_KEY"
+```
+
+A work order in another organization returns `404`, the same as one that doesn't exist.
+
+## Statuses
+
+`job_status` is one of:
+
+| Status | Meaning |
+| --- | --- |
+| `DRAFT` | Received. Tavi is reviewing it. |
+| `ACTIVE` | Tavi is sourcing a provider, scheduling, or the work is under way. |
+| `SETTLEMENT` | The work is done and payment is processing. |
+| `COMPLETED` | Closed. `completed_at` is when. |
+| `CANCELLED` | Cancelled. |
+
+Use the fields below for detail within `ACTIVE`.
+
+## Progress
+
+| Field | What it tells you |
+| --- | --- |
+| `options` | One entry per provider option, anonymized as `alias` (for example "Option A"). Once Tavi publishes an option, it carries `quoted_price_dollars`, `pre_tax_amount`, `tax_amount`, `scope_of_work` and the provider's checks (`has_insurance`, `has_license`, `has_w9`, `has_references`). `is_recommended` marks Tavi's pick. See [approving an option](#approve-an-option). |
+| `has_dispatched_option` | `true` once a provider is booked. |
+| `awarded_options` | The booked option, with its price and `payment_terms`. |
+| `visits` | Site visits and work visits, oldest first, each with `scheduled_at`, `duration_minutes` and a `status` of `scheduled`, `completed` or `not_finished`. |
+| `change_orders` | Additional work requested on the work order. |
+
+Prices are all-in amounts in US dollars, with tax shown in `tax_amount`.
+
+## Approve an option
+
+When Tavi has quotes, it publishes them as options and the work order waits for your pick. An option you can approve has `is_approvable: true`. Approve it by its letter ("B" for "Option B"), sending its terms as you read them:
+
+```bash
+curl -X POST "$TAVI_API/api/v1/jobs/client/$JOB_ID/options/B/approve" \
+  -H "X-Tavi-API-Key: $TAVI_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "pre_tax_amount": 1200.00,
+    "tax_amount": 99.00,
+    "scope_of_work": "Replace the wax ring and reset the toilet."
+  }'
+```
+
+Copy `pre_tax_amount`, `tax_amount` and `scope_of_work` from the option. If Tavi changed any of them after you read the work order, the approval is refused with `409`; read the work order again and show the new terms before retrying.
+
+The response names the option and its `approved_at`. Your Tavi team is notified and moves ahead with that option, and the option shows the same `approved_at` when you next read the work order. You can approve one option per work order. To change your pick, contact your Tavi team.
+
+## Sign-off and photos
+
+When a visit ends, its entry in `visits` records `clocked_in_at` and `clocked_out_at`, the name of the person who signed off (`signed_by_name`), their `signature`, and the sign-off `photos`. A visit marked `not_finished` means the work couldn't be completed on that visit.
+
+Every file has a `download_url` that works without an API key and stays valid for at least 30 days. Read the work order again for a fresh link.
+
+## List work orders
+
+```bash
+curl "$TAVI_API/api/v1/jobs/client?scope=all&limit=50" \
+  -H "X-Tavi-API-Key: $TAVI_KEY"
+```
+
+The list is newest first and paginated with `skip` and `limit`. Filter with `status`, `location_id` or `asset_id`. `scope=assigned` (the default) returns work orders at sites on your key's team; `scope=all` returns your whole organization.
+
+List entries carry the summary fields: `id`, `trade`, `description`, `job_status`, `created_at`, `completed_at` and `location`.
+
+## Keeping in sync
+
+Tavi doesn't send status callbacks yet. Poll instead:
+
+- List open work orders every few minutes to catch status changes.
+- Read a work order in full when its status changes, or when someone opens it in your product.

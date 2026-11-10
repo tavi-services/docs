@@ -1,0 +1,78 @@
+---
+title: "Filing work orders"
+description: "What to send when you file a work order."
+---
+
+```http
+POST /api/v1/jobs/client/
+X-Tavi-API-Key: <key>
+Content-Type: application/json
+```
+
+## Fields
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `location_id` | Yes | The site. It must be on your key's team. |
+| `trade` | Yes | One of the trades from `GET /api/v1/trades/`, such as `PLUMBING`, `ELECTRICAL`, `HVAC`, `HANDYMAN` or `LOCKSMITH`. |
+| `description` | Yes | What's wrong, in plain words. Include what the person on site sees and anything already tried. |
+| `deadline_date` | Yes | The date the work must be done by (`YYYY-MM-DD`). A deadline within three business days marks the work order as an emergency. |
+| `price_dne_requirement` | No | Do-not-exceed price in US dollars. Tavi contacts you before going over it. |
+| `site_contact` | No | The person at the site Tavi calls or texts to arrange access and the visit. See below. |
+| `escalation_contact` | No | Who Tavi goes to when the site contact can't decide, such as a facility manager. See below. |
+| `context` | No | Anything else Tavi should know, such as access instructions or opening hours. Up to 4,000 characters. |
+
+The response is the new work order in the same shape as [reading a work order](/tracking). Its `job_status` starts as `DRAFT`.
+
+## The site contact
+
+```json
+"site_contact": {
+  "first_name": "Dana",
+  "last_name": "Lee",
+  "phone": "+15125550142"
+}
+```
+
+`first_name` and `phone` are required. Tavi matches the phone number to a contact already in your organization, or creates one, and adds them to the site's team. They become the work order's lead contact. A contact created this way has no Tavi sign-in.
+
+Tavi contacts them by phone and text about the visit, and they can reply STOP to opt out of texts. A phone number that belongs to another organization's contact returns `409`.
+
+## The escalation contact
+
+```json
+"escalation_contact": {
+  "first_name": "Pat",
+  "last_name": "Kim",
+  "title": "Facility manager",
+  "phone": "+15125550199"
+}
+```
+
+The person Tavi goes to when the site contact can't make a call: a quote over the do-not-exceed price, an access problem, or an issue the site can't resolve. `first_name` and `phone` are required; `title` is their role.
+
+Tavi matches or creates them the same way as the site contact and adds them to the site's team. They're named on the work order (the description ends with `Escalation contact: Pat Kim (Facility manager), +15125550199`), and the site contact stays the lead contact. A phone number that belongs to another organization's contact returns `409`.
+
+## Context
+
+Use `context` for the details a technician or coordinator needs that aren't part of the problem itself. Tavi adds it to the description under an "Additional context" heading. For example:
+
+```json
+"context": "Back door code 4412. Open 7am-10pm. Park in the loading bay."
+```
+
+## Photos and files
+
+Add photos to a work order after you file it:
+
+```bash
+curl -X POST "$TAVI_API/api/v1/attachments/upload/job/$JOB_ID" \
+  -H "X-Tavi-API-Key: $TAVI_KEY" \
+  -F "file=@clog.jpg"
+```
+
+Send one file per request.
+
+## Retries
+
+Each successful call files a new work order. If a request times out, [list work orders](/tracking#list-work-orders) at the site before you retry, so you don't file the same work twice.

@@ -1,0 +1,82 @@
+---
+title: "Quickstart"
+description: "File your first work order and read it back."
+---
+
+The API base URL is `https://api.trytavi.com`. You need an API key, which your Tavi team gives you.
+
+You start with a sandbox key. It belongs to a test organization that comes with sample work orders, and Tavi treats the work orders you file with it as tests: they are never sent to a provider. When you're ready to go live, Tavi gives you a key for your real organization. The base URL stays the same.
+
+In the examples, `$TAVI_API` is the base URL and `$TAVI_KEY` is your key:
+
+```bash
+export TAVI_API="https://api.trytavi.com"
+export TAVI_KEY="tavi_sk_..."
+```
+
+## 1. List your sites
+
+```bash
+curl "$TAVI_API/api/v1/locations/" \
+  -H "X-Tavi-API-Key: $TAVI_KEY"
+```
+
+```json
+{
+  "items": [
+    {
+      "id": "6f1c2a8e-3b7d-4c55-9a51-0f2a1e9c7b10",
+      "name": "Store 104 - Austin",
+      "address_line_1": "1200 S Lamar Blvd",
+      "city": "Austin",
+      "state": "TX",
+      "postal_code": "78704",
+      "timezone": "America/Chicago",
+      "is_user_assigned": true
+    }
+  ],
+  "total": 1,
+  "skip": 0,
+  "limit": 100
+}
+```
+
+No site yet? [Create one](/sites).
+
+## 2. File a work order
+
+```bash
+curl -X POST "$TAVI_API/api/v1/jobs/client/" \
+  -H "X-Tavi-API-Key: $TAVI_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "location_id": "6f1c2a8e-3b7d-4c55-9a51-0f2a1e9c7b10",
+    "trade": "PLUMBING",
+    "description": "Toilet in the back-of-house restroom is clogged and overflowing.",
+    "deadline_date": "2026-11-16",
+    "price_dne_requirement": 750,
+    "site_contact": {
+      "first_name": "Dana",
+      "last_name": "Lee",
+      "phone": "+15125550142"
+    },
+    "escalation_contact": {
+      "first_name": "Pat",
+      "last_name": "Kim",
+      "title": "Facility manager",
+      "phone": "+15125550199"
+    },
+    "context": "Back door code 4412. Open 7am-10pm."
+  }'
+```
+
+The response is the new work order, with `job_status` set to `DRAFT`. Keep its `id`.
+
+## 3. Read it back
+
+```bash
+curl "$TAVI_API/api/v1/jobs/client/$JOB_ID" \
+  -H "X-Tavi-API-Key: $TAVI_KEY"
+```
+
+Read it again whenever you want to show progress. See [tracking work orders](/tracking) for what each field means, and [example work orders](/examples) for what a work order looks like at each stage.
