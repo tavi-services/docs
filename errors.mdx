@@ -10,7 +10,7 @@ Errors return a JSON body with a `detail` field explaining the problem.
 | `400` | The request is invalid, for example a phone number Tavi can't use. | Fix the request. |
 | `401` | No API key was sent. | Send `X-Tavi-API-Key`. |
 | `403` | The key is unknown, revoked or expired; it can't use this endpoint; or the site isn't on your key's team. | Check the key and the site. |
-| `404` | The work order or site doesn't exist, or belongs to another organization. | Check the id. |
+| `404` | The work order or site doesn't exist, or belongs to another organization. When approving, the work order has no option with that letter. | Check the id, or read the work order for its options. |
 | `409` | The site or escalation contact's phone belongs to another organization's account. Or, when approving an option: an option is already approved, this one isn't ready, or its terms changed since you read them. | Use a different contact. For an approval, read the work order again. |
 | `422` | A field is missing or has the wrong type. `detail` lists each problem. | Fix the listed fields. |
 | `5xx` | Something went wrong at Tavi. | Retry with backoff. Before retrying a create, check whether the work order was filed. |
