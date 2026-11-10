@@ -6,12 +6,7 @@
   },
   "servers": [
     {
-      "url": "https://api.trytavi.com",
-      "description": "Production"
-    },
-    {
-      "url": "https://api.demo.trytavi.com",
-      "description": "Sandbox"
+      "url": "https://api.trytavi.com"
     }
   ],
   "tags": [

@@ -167,11 +167,8 @@ def main() -> None:
     spec = {
         "openapi": source["openapi"],
         "info": {"title": "Tavi Client API", "version": "1.0"},
-        # Same hosts as quickstart.mdx: prod, then the demo backend the sandbox key runs on.
-        "servers": [
-            {"url": "https://api.trytavi.com", "description": "Production"},
-            {"url": "https://api.demo.trytavi.com", "description": "Sandbox"},
-        ],
+        # Same host as quickstart.mdx; sandbox keys are a test org on this host.
+        "servers": [{"url": "https://api.trytavi.com"}],
         # Sidebar groups in ROUTES order.
         "tags": [{"name": tag} for tag in dict.fromkeys(t for t, _ in ROUTES.values())],
         "paths": paths,
