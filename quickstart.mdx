@@ -3,9 +3,19 @@ title: "Quickstart"
 description: "File your first work order and read it back."
 ---
 
-You need an API key and the API base URL. Your Tavi team gives you both, starting with a sandbox key whose work orders never reach a real provider.
+You need an API key, which your Tavi team gives you. You start with a sandbox key, whose work orders never reach a real provider.
 
-In the examples, `$TAVI_API` is the base URL and `$TAVI_KEY` is your key.
+| Environment | Base URL |
+| --- | --- |
+| Sandbox | `https://api.demo.trytavi.com` |
+| Production | `https://api.trytavi.com` |
+
+A key works only in its own environment. In the examples, `$TAVI_API` is the base URL and `$TAVI_KEY` is your key:
+
+```bash
+export TAVI_API="https://api.demo.trytavi.com"
+export TAVI_KEY="tavi_sk_..."
+```
 
 ## 1. List your sites
 

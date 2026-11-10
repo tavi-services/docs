@@ -4,6 +4,16 @@
     "title": "Tavi Client API",
     "version": "1.0"
   },
+  "servers": [
+    {
+      "url": "https://api.trytavi.com",
+      "description": "Production"
+    },
+    {
+      "url": "https://api.demo.trytavi.com",
+      "description": "Sandbox"
+    }
+  ],
   "tags": [
     {
       "name": "Work orders"
