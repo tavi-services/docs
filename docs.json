@@ -15,7 +15,7 @@
       },
       {
         "group": "Guides",
-        "pages": ["sites", "work-orders", "tracking", "errors"]
+        "pages": ["sites", "work-orders", "tracking", "examples", "errors"]
       },
       {
         "group": "Trust",

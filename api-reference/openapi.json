@@ -4,11 +4,25 @@
     "title": "Tavi Client API",
     "version": "1.0"
   },
+  "tags": [
+    {
+      "name": "Work orders"
+    },
+    {
+      "name": "Photos and files"
+    },
+    {
+      "name": "Sites"
+    },
+    {
+      "name": "Trades"
+    }
+  ],
   "paths": {
     "/api/v1/jobs/client/": {
       "post": {
         "tags": [
-          "jobs"
+          "Work orders"
         ],
         "summary": "Create a work order",
         "operationId": "create_job_from_client",
@@ -70,7 +84,7 @@
     "/api/v1/jobs/client": {
       "get": {
         "tags": [
-          "jobs"
+          "Work orders"
         ],
         "summary": "List work orders",
         "operationId": "list_jobs_for_client",
@@ -216,7 +230,7 @@
     "/api/v1/jobs/client/{job_id}": {
       "get": {
         "tags": [
-          "jobs"
+          "Work orders"
         ],
         "summary": "Get a work order",
         "operationId": "get_job_for_client",
@@ -270,10 +284,89 @@
         }
       }
     },
+    "/api/v1/jobs/client/{job_id}/options/{letter}/approve": {
+      "post": {
+        "tags": [
+          "Work orders"
+        ],
+        "summary": "Approve an option",
+        "operationId": "approve_client_option",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Id"
+            }
+          },
+          {
+            "name": "letter",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Letter"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientOptionApproveRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientOptionApproveResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No session and no X-Tavi-API-Key."
+          },
+          "403": {
+            "description": "Caller is not a client user, or has no access to the job's location."
+          },
+          "404": {
+            "description": "Work order or published option not found."
+          },
+          "409": {
+            "description": "An option on the work order is already approved, this one isn't ready to be approved yet or changed since the page loaded, or the work order isn't active."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/attachments/upload/job/{job_id}": {
       "post": {
         "tags": [
-          "attachments"
+          "Photos and files"
         ],
         "summary": "Upload a photo or file",
         "operationId": "upload_job_attachment",
@@ -340,7 +433,7 @@
     "/api/v1/locations/client/": {
       "post": {
         "tags": [
-          "locations"
+          "Sites"
         ],
         "summary": "Create a site",
         "operationId": "create_location_from_client",
@@ -396,7 +489,7 @@
     "/api/v1/locations/": {
       "get": {
         "tags": [
-          "locations"
+          "Sites"
         ],
         "summary": "List sites",
         "operationId": "list_locations",
@@ -470,7 +563,7 @@
     "/api/v1/trades/": {
       "get": {
         "tags": [
-          "trades"
+          "Trades"
         ],
         "summary": "List trades",
         "operationId": "list_trades",
@@ -709,6 +802,53 @@
         "title": "ClientAwardedOption",
         "description": "The option that was awarded, with its price and payment schedule."
       },
+      "ClientEscalationContactCreateRequest": {
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "phone": {
+            "type": "string",
+            "title": "Phone",
+            "description": "Mobile number; Tavi calls and texts it."
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "Their role, such as Facility manager."
+          }
+        },
+        "type": "object",
+        "required": [
+          "first_name",
+          "phone"
+        ],
+        "title": "ClientEscalationContactCreateRequest",
+        "description": "Who Tavi escalates to when the site contact can't decide, such as a facility manager."
+      },
       "ClientJobCreateRequest": {
         "properties": {
           "location_id": {
@@ -796,6 +936,17 @@
             ],
             "description": "The on-site contact Tavi coordinates the visit with. Matched by phone to an existing contact in your organization, or created, and added to the site's team. Use instead of client_owner_user_id."
           },
+          "escalation_contact": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClientEscalationContactCreateRequest"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Who Tavi escalates to when the site contact can't decide, such as a facility manager. Matched by phone to an existing contact in your organization, or created, and added to the site's team."
+          },
           "context": {
             "anyOf": [
               {
@@ -807,7 +958,7 @@
               }
             ],
             "title": "Context",
-            "description": "Anything else Tavi should know: an escalation contact for approvals, access instructions, or customer specifics. Shown to Tavi alongside the description."
+            "description": "Anything else Tavi should know: access instructions, opening hours, or customer specifics. Shown to Tavi alongside the description."
           }
         },
         "type": "object",
@@ -962,9 +1113,6 @@
             "title": "Attachments",
             "default": []
           },
-          "pipeline": {
-            "$ref": "#/components/schemas/ClientOptionPipeline"
-          },
           "options": {
             "items": {
               "$ref": "#/components/schemas/ClientOptionSummary"
@@ -1022,8 +1170,7 @@
           "created_at",
           "location",
           "deadline_date",
-          "is_emergency",
-          "pipeline"
+          "is_emergency"
         ],
         "title": "ClientJobDetailResponse",
         "description": "A work order with its sourcing progress, quotes, visits and sign-off evidence. Subcontractor identities are never included; Tavi is the contracted provider."
@@ -1369,44 +1516,65 @@
         "title": "ClientLocationCreate",
         "description": "A new site. Tavi geocodes the address."
       },
-      "ClientOptionPipeline": {
+      "ClientOptionApproveRequest": {
         "properties": {
-          "total": {
-            "type": "integer",
-            "title": "Total"
+          "pre_tax_amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pre Tax Amount"
           },
-          "vetted": {
-            "type": "integer",
-            "title": "Vetted"
+          "tax_amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tax Amount"
           },
-          "contacted": {
-            "type": "integer",
-            "title": "Contacted"
+          "scope_of_work": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope Of Work"
+          }
+        },
+        "type": "object",
+        "title": "ClientOptionApproveRequest",
+        "description": "The option's terms as you read them: pre_tax_amount, tax_amount and scope_of_work from the option. Tavi refuses the approval if any of them changed since."
+      },
+      "ClientOptionApproveResponse": {
+        "properties": {
+          "alias": {
+            "type": "string",
+            "title": "Alias"
           },
-          "responded": {
-            "type": "integer",
-            "title": "Responded"
-          },
-          "site_visits": {
-            "type": "integer",
-            "title": "Site Visits"
-          },
-          "bids": {
-            "type": "integer",
-            "title": "Bids"
+          "approved_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Approved At"
           }
         },
         "type": "object",
         "required": [
-          "total",
-          "vetted",
-          "contacted",
-          "responded",
-          "site_visits",
-          "bids"
+          "alias",
+          "approved_at"
         ],
-        "title": "ClientOptionPipeline",
-        "description": "How many providers Tavi has vetted, contacted, heard from, visited and received bids from."
+        "title": "ClientOptionApproveResponse",
+        "description": "The approved option and when it was approved."
       },
       "ClientOptionSummary": {
         "properties": {

@@ -1,0 +1,209 @@
+---
+title: "Example work orders"
+description: "Sample responses at each stage of a work order."
+---
+
+These are sample responses from `GET /api/v1/jobs/client/{job_id}` for one plumbing work order as it moves through Tavi. Ids, names and numbers are made up. Your sandbox key returns responses in the same shape.
+
+## 1. Quotes ready for your pick
+
+Tavi has sourced two providers and published their quotes. Option B is Tavi's recommendation, and both can be approved.
+
+```json
+{
+  "id": "0b7e4f1c-5d2a-4e8b-9c31-6a2f8d0e4b17",
+  "organization_id": "c41d9a2e-7f63-4b0a-8e15-2d9c6b7a3f80",
+  "trade": "PLUMBING",
+  "description": "Toilet in the back-of-house restroom is clogged and overflowing.\n\nEscalation contact: Pat Kim (Facility manager), +15125550199\n\nAdditional context:\nBack door code 4412. Open 7am-10pm.",
+  "job_status": "ACTIVE",
+  "created_at": "2026-11-10T15:02:11Z",
+  "completed_at": null,
+  "deadline_date": "2026-11-16",
+  "is_emergency": false,
+  "price_dne_requirement": 750.0,
+  "location": {
+    "id": "6f1c2a8e-3b7d-4c55-9a51-0f2a1e9c7b10",
+    "name": "Store 104 - Austin",
+    "address_line_1": "1200 S Lamar Blvd",
+    "address_line_2": null,
+    "city": "Austin",
+    "state": "TX",
+    "postal_code": "78704",
+    "timezone": "America/Chicago"
+  },
+  "is_user_assigned": true,
+  "client_owner_user_id": "9a3e5c7b-1d24-4f68-b0e2-7c5a9d1f3e46",
+  "client_owner_name": "Dana Lee",
+  "assets": [],
+  "attachments": [],
+  "options": [
+    {
+      "alias": "Option A",
+      "funnel_state": "QUOTE",
+      "quoted_price_dollars": 812.0,
+      "pre_tax_amount": 750.0,
+      "tax_amount": 62.0,
+      "scope_of_work": "Snake the main line from the cleanout, replace the wax ring and reset the toilet.",
+      "has_site_visit": false,
+      "has_bid": true,
+      "has_insurance": true,
+      "has_w9": true,
+      "has_license": true,
+      "has_references": false,
+      "notes": null,
+      "is_recommended": false,
+      "published_at": "2026-11-11T18:40:00Z",
+      "approved_at": null,
+      "is_approvable": true
+    },
+    {
+      "alias": "Option B",
+      "funnel_state": "QUOTE",
+      "quoted_price_dollars": 649.5,
+      "pre_tax_amount": 600.0,
+      "tax_amount": 49.5,
+      "scope_of_work": "Clear the blockage, replace the wax ring and flange bolts, and reset the toilet.",
+      "has_site_visit": true,
+      "has_bid": true,
+      "has_insurance": true,
+      "has_w9": true,
+      "has_license": true,
+      "has_references": true,
+      "notes": "Can be on site Thursday morning.",
+      "is_recommended": true,
+      "published_at": "2026-11-11T18:40:00Z",
+      "approved_at": null,
+      "is_approvable": true
+    }
+  ],
+  "has_dispatched_option": false,
+  "awarded_options": [],
+  "visits": [],
+  "recurrence": null,
+  "change_orders": []
+}
+```
+
+To pick Option B, [approve it](/tracking#approve-an-option) with its `pre_tax_amount`, `tax_amount` and `scope_of_work`.
+
+## 2. Option approved and visit scheduled
+
+You approved Option B and Tavi booked the visit. Only the fields that changed are shown.
+
+```json
+{
+  "job_status": "ACTIVE",
+  "options": [
+    { "alias": "Option A", "approved_at": null, "is_approvable": false },
+    {
+      "alias": "Option B",
+      "funnel_state": "PAYMENTS",
+      "approved_at": "2026-11-11T19:05:42Z",
+      "is_approvable": false
+    }
+  ],
+  "has_dispatched_option": true,
+  "awarded_options": [
+    {
+      "quoted_price_dollars": 649.5,
+      "pre_tax_amount": 600.0,
+      "tax_amount": 49.5,
+      "has_insurance": true,
+      "has_w9": true,
+      "has_license": true,
+      "has_references": true,
+      "published_at": "2026-11-11T18:40:00Z",
+      "payment_terms": [
+        {
+          "tranche_index": 0,
+          "tranche_name": "Completion",
+          "tranche_percent": 100.0,
+          "amount": 649.5,
+          "accounts_payable_days": 30,
+          "due_date": null,
+          "payment_received": false,
+          "notes": null,
+          "files": []
+        }
+      ]
+    }
+  ],
+  "visits": [
+    {
+      "id": "e2c84b19-6a3f-4d07-8b5e-1f9a2c6d7e30",
+      "kind": "work_event",
+      "option_alias": "Option B",
+      "scheduled_at": "2026-11-13T15:00:00Z",
+      "duration_minutes": 120,
+      "is_all_day": false,
+      "status": "scheduled",
+      "completed_at": null,
+      "clocked_in_at": null,
+      "clocked_out_at": null,
+      "signed_by_name": null,
+      "signature": null,
+      "photos": []
+    }
+  ]
+}
+```
+
+## 3. Work done and signed off
+
+The technician finished, Dana signed off on site, and payment has been settled. Only the fields that changed are shown.
+
+```json
+{
+  "job_status": "COMPLETED",
+  "completed_at": "2026-11-20T16:12:03Z",
+  "visits": [
+    {
+      "id": "e2c84b19-6a3f-4d07-8b5e-1f9a2c6d7e30",
+      "kind": "work_event",
+      "option_alias": "Option B",
+      "scheduled_at": "2026-11-13T15:00:00Z",
+      "duration_minutes": 120,
+      "is_all_day": false,
+      "status": "completed",
+      "completed_at": "2026-11-13T16:31:08Z",
+      "clocked_in_at": "2026-11-13T15:07:44Z",
+      "clocked_out_at": "2026-11-13T16:31:08Z",
+      "signed_by_name": "Dana Lee",
+      "signature": {
+        "id": "4d1f7a2b-9c3e-4b85-a6d0-2e8f5c1b7a93",
+        "categories": ["SIGNOFF_SIGNATURE"],
+        "name": "signature.png",
+        "content_type": "image/png",
+        "size_bytes": 18422,
+        "storage_path": "jobs/0b7e4f1c-5d2a-4e8b-9c31-6a2f8d0e4b17/signature.png",
+        "created_at": "2026-11-13T16:31:08Z",
+        "download_url": "https://files.example.com/signature.png?token=..."
+      },
+      "photos": [
+        {
+          "id": "7b2e9d4c-1a5f-4c38-9e06-3d7a1b8f2c54",
+          "categories": ["SIGNOFF_BEFORE_PHOTO"],
+          "name": "before.jpg",
+          "content_type": "image/jpeg",
+          "size_bytes": 412337,
+          "storage_path": "jobs/0b7e4f1c-5d2a-4e8b-9c31-6a2f8d0e4b17/before.jpg",
+          "created_at": "2026-11-13T15:09:20Z",
+          "download_url": "https://files.example.com/before.jpg?token=..."
+        },
+        {
+          "id": "a85c3f1e-2d7b-4e94-b1c6-8f0d2a5e9b71",
+          "categories": ["SIGNOFF_PHOTO"],
+          "name": "after.jpg",
+          "content_type": "image/jpeg",
+          "size_bytes": 398104,
+          "storage_path": "jobs/0b7e4f1c-5d2a-4e8b-9c31-6a2f8d0e4b17/after.jpg",
+          "created_at": "2026-11-13T16:28:51Z",
+          "download_url": "https://files.example.com/after.jpg?token=..."
+        }
+      ]
+    }
+  ]
+}
+```
+
+A visit with `status: "not_finished"` means the work couldn't be completed that day. Expect another visit on the same work order.

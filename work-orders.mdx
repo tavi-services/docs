@@ -19,7 +19,8 @@ Content-Type: application/json
 | `deadline_date` | Yes | The date the work must be done by (`YYYY-MM-DD`). A deadline within three business days marks the work order as an emergency. |
 | `price_dne_requirement` | No | Do-not-exceed price in US dollars. Tavi contacts you before going over it. |
 | `site_contact` | No | The person at the site Tavi calls or texts to arrange access and the visit. See below. |
-| `context` | No | Anything else Tavi should know, such as an escalation contact for approvals, access instructions or opening hours. Up to 4,000 characters. |
+| `escalation_contact` | No | Who Tavi goes to when the site contact can't decide, such as a facility manager. See below. |
+| `context` | No | Anything else Tavi should know, such as access instructions or opening hours. Up to 4,000 characters. |
 
 The response is the new work order in the same shape as [reading a work order](/tracking). Its `job_status` starts as `DRAFT`.
 
@@ -37,12 +38,27 @@ The response is the new work order in the same shape as [reading a work order](/
 
 Tavi contacts them by phone and text about the visit, and they can reply STOP to opt out of texts. A phone number that belongs to another organization's contact returns `409`.
 
+## The escalation contact
+
+```json
+"escalation_contact": {
+  "first_name": "Pat",
+  "last_name": "Kim",
+  "title": "Facility manager",
+  "phone": "+15125550199"
+}
+```
+
+The person Tavi goes to when the site contact can't make a call: a quote over the do-not-exceed price, an access problem, or an issue the site can't resolve. `first_name` and `phone` are required; `title` is their role.
+
+Tavi matches or creates them the same way as the site contact and adds them to the site's team. They're named on the work order (the description ends with `Escalation contact: Pat Kim (Facility manager), +15125550199`), and the site contact stays the lead contact. A phone number that belongs to another organization's contact returns `409`.
+
 ## Context
 
 Use `context` for the details a technician or coordinator needs that aren't part of the problem itself. Tavi adds it to the description under an "Additional context" heading. For example:
 
 ```json
-"context": "Escalate approvals over $500 to Pat Kim (regional manager), +1 512 555 0199. Back door code 4412. Open 7am-10pm."
+"context": "Back door code 4412. Open 7am-10pm. Park in the loading bay."
 ```
 
 ## Photos and files

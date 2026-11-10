@@ -14,17 +14,24 @@ import json
 import sys
 from pathlib import Path
 
-# (path, method) pairs published in the reference, with the summary shown in
-# the sidebar. Keep in step with CLIENT_API_KEY_ROUTES (spend is left out of
-# the work-order docs on purpose).
-ROUTES: dict[tuple[str, str], str] = {
-    ("/api/v1/jobs/client/", "post"): "Create a work order",
-    ("/api/v1/jobs/client", "get"): "List work orders",
-    ("/api/v1/jobs/client/{job_id}", "get"): "Get a work order",
-    ("/api/v1/attachments/upload/job/{job_id}", "post"): "Upload a photo or file",
-    ("/api/v1/locations/client/", "post"): "Create a site",
-    ("/api/v1/locations/", "get"): "List sites",
-    ("/api/v1/trades/", "get"): "List trades",
+# (path, method) pairs published in the reference, with the sidebar group and
+# the summary shown under it. Keep in step with CLIENT_API_KEY_ROUTES (spend is
+# left out of the work-order docs on purpose).
+ROUTES: dict[tuple[str, str], tuple[str, str]] = {
+    ("/api/v1/jobs/client/", "post"): ("Work orders", "Create a work order"),
+    ("/api/v1/jobs/client", "get"): ("Work orders", "List work orders"),
+    ("/api/v1/jobs/client/{job_id}", "get"): ("Work orders", "Get a work order"),
+    ("/api/v1/jobs/client/{job_id}/options/{letter}/approve", "post"): (
+        "Work orders",
+        "Approve an option",
+    ),
+    ("/api/v1/attachments/upload/job/{job_id}", "post"): (
+        "Photos and files",
+        "Upload a photo or file",
+    ),
+    ("/api/v1/locations/client/", "post"): ("Sites", "Create a site"),
+    ("/api/v1/locations/", "get"): ("Sites", "List sites"),
+    ("/api/v1/trades/", "get"): ("Trades", "List trades"),
 }
 
 # Query parameters only Tavi staff may send; partners never need them.
@@ -32,6 +39,10 @@ STAFF_ONLY_PARAMS = {"org_id", "organization_id"}
 
 # Request fields used only by Tavi's own apps.
 INTERNAL_FIELDS = {"ai_chat_tool_use_id"}
+
+# Response fields the backend withholds from API key callers (always null for
+# them), so the reference leaves them out.
+WITHHELD_FIELDS = {("ClientJobDetailResponse", "pipeline")}
 
 # Public descriptions for the schemas a partner reads. The backend's own
 # schema docstrings are written for Tavi engineers, so every schema not listed
@@ -44,7 +55,14 @@ SCHEMA_DESCRIPTIONS = {
         "A work order with its sourcing progress, quotes, visits and sign-off evidence. "
         "Subcontractor identities are never included; Tavi is the contracted provider."
     ),
-    "ClientOptionPipeline": "How many providers Tavi has vetted, contacted, heard from, visited and received bids from.",
+    "ClientEscalationContactCreateRequest": (
+        "Who Tavi escalates to when the site contact can't decide, such as a facility manager."
+    ),
+    "ClientOptionApproveRequest": (
+        "The option's terms as you read them: pre_tax_amount, tax_amount and scope_of_work "
+        "from the option. Tavi refuses the approval if any of them changed since."
+    ),
+    "ClientOptionApproveResponse": "The approved option and when it was approved.",
     "ClientOptionSummary": "One anonymized provider option and its quote, once published.",
     "ClientAwardedOption": "The option that was awarded, with its price and payment schedule.",
     "ClientJobVisitReadResponse": (
@@ -98,9 +116,10 @@ def main() -> None:
     """Filter the snapshot named on the command line into the published spec."""
     source = json.loads(Path(sys.argv[1]).read_text())
     paths: dict[str, dict] = {}
-    for (path, method), summary in ROUTES.items():
+    for (path, method), (tag, summary) in ROUTES.items():
         operation = dict(source["paths"][path][method])
         operation["summary"] = summary
+        operation["tags"] = [tag]
         operation.pop("description", None)
         operation["parameters"] = [
             p
@@ -114,8 +133,13 @@ def main() -> None:
         operation["security"] = [{"ApiKey": []}]
         paths.setdefault(path, {})[method] = operation
 
-    # Pull in referenced schemas until the set stops growing.
+    # Pull in referenced schemas until the set stops growing. Withheld fields
+    # go first, so a schema only they reference isn't published.
     schemas = source["components"]["schemas"]
+    for schema_name, field in WITHHELD_FIELDS:
+        schemas[schema_name].get("properties", {}).pop(field, None)
+        if field in schemas[schema_name].get("required", []):
+            schemas[schema_name]["required"].remove(field)
     needed: set[str] = set()
     collect_refs(paths, needed)
     while True:
@@ -143,6 +167,8 @@ def main() -> None:
     spec = {
         "openapi": source["openapi"],
         "info": {"title": "Tavi Client API", "version": "1.0"},
+        # Sidebar groups in ROUTES order.
+        "tags": [{"name": tag} for tag in dict.fromkeys(t for t, _ in ROUTES.values())],
         "paths": paths,
         "components": {
             "schemas": published,
