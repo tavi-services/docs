@@ -80,3 +80,15 @@ curl "$TAVI_API/api/v1/jobs/client/$JOB_ID" \
 ```
 
 Read it again whenever you want to show progress. See [tracking work orders](/tracking) for what each field means, and [example work orders](/examples) for what a work order looks like at each stage.
+
+## In the sandbox
+
+With a sandbox key, each work order you file moves through the stages on its own, about two minutes apart, so you can test your polling and approval end to end:
+
+1. `job_status` moves from `DRAFT` to `ACTIVE`, with two quote options, `Option A` and `Option B`, both approvable. `Option A` is the recommended one.
+2. The work order waits until you [approve an option](/tracking#approve-an-option).
+3. About two minutes after the approval, the approved option is awarded and a work visit is scheduled for two minutes later.
+4. When the visit's time comes, it is completed with a sign-off.
+5. Two minutes later `job_status` moves to `SETTLEMENT`, and two minutes after that to `COMPLETED`.
+
+Sandbox quotes come from test providers. Nothing is sent to anyone.
