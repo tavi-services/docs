@@ -13,7 +13,8 @@ Content-Type: application/json
 
 | Field | Required | Description |
 | --- | --- | --- |
-| `location_id` | Yes | The site. It must be on your key's team. |
+| `site` | One of `site` or `location_id` | The site, sent inline and keyed by your own id for it. See below. |
+| `location_id` | One of `site` or `location_id` | A Tavi site id from [creating a site](/sites). It must be on your key's team. |
 | `trade` | Yes | One of the trades from `GET /api/v1/trades/`, such as `PLUMBING`, `ELECTRICAL`, `HVAC`, `HANDYMAN` or `LOCKSMITH`. |
 | `description` | Yes | What's wrong, in plain words. Include what the person on site sees and anything already tried. |
 | `deadline_date` | Yes | The date the work must be done by (`YYYY-MM-DD`). A deadline within three business days marks the work order as an emergency. |
@@ -23,6 +24,29 @@ Content-Type: application/json
 | `context` | No | Anything else Tavi should know, such as access instructions or opening hours. Up to 4,000 characters. |
 
 The response is the new work order in the same shape as [reading a work order](/tracking). Its `job_status` starts as `DRAFT`.
+
+## The site
+
+Send the site inline with each work order, keyed by your own id for it, so you don't need to store Tavi's site ids or track changes:
+
+```json
+"site": {
+  "external_id": "store-104",
+  "name": "Store 104 - Austin",
+  "address_line_1": "1200 S Lamar Blvd",
+  "city": "Austin",
+  "state": "TX",
+  "postal_code": "78704"
+}
+```
+
+`external_id`, `name`, `address_line_1`, `city`, `state` and `postal_code` are required; `address_line_2` and `country` are optional.
+
+- **First work order for an id:** Tavi creates the site, geocodes it and adds it to your key's team.
+- **Same address again:** Tavi uses the same site. Differences in case or spacing don't count as a change.
+- **New name or address:** Tavi updates the site. Every work order there shows the new address, and Tavi checks that any open work order at the site has the right one.
+
+An address that can't be found returns `422`, and nothing is filed. Work orders carry the id back as `location.external_id`.
 
 ## The site contact
 
@@ -75,4 +99,4 @@ Send one file per request.
 
 ## Retries
 
-Each successful call files a new work order. If a request times out, [list work orders](/tracking#list-work-orders) at the site before you retry, so you don't file the same work twice.
+Each successful call files a new work order. If a request times out, [list work orders](/tracking#list-work-orders) at the site (by `site_external_id` or `location_id`) before you retry, so you don't file the same work twice.

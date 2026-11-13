@@ -70,7 +70,7 @@ curl "$TAVI_API/api/v1/jobs/client?scope=all&limit=50" \
   -H "X-Tavi-API-Key: $TAVI_KEY"
 ```
 
-The list is newest first and paginated with `skip` and `limit`. Filter with `status`, `location_id` or `asset_id`. `scope=assigned` (the default) returns work orders at sites on your key's team; `scope=all` returns your whole organization.
+The list is newest first and paginated with `skip` and `limit`. Filter with `status`, `location_id`, `site_external_id` (your own id for an inline site) or `asset_id`. `scope=assigned` (the default) returns work orders at sites on your key's team; `scope=all` returns your whole organization.
 
 List entries carry the summary fields: `id`, `trade`, `description`, `job_status`, `created_at`, `completed_at` and `location`.
 
