@@ -3,7 +3,7 @@ title: "Sites"
 description: "Create and list the places work happens."
 ---
 
-Every work order is at a site. Create each site once and keep its `id` alongside your own record for it.
+Every work order is at a site. The simplest option is to send the site [inline with each work order](/work-orders#the-site), keyed by your own id for it. Otherwise, create each site once here and keep its `id` alongside your own record for it.
 
 ## Create a site
 
@@ -31,4 +31,4 @@ curl "$TAVI_API/api/v1/locations/?limit=100" \
   -H "X-Tavi-API-Key: $TAVI_KEY"
 ```
 
-Results are paginated with `skip` and `limit`. `total` is the number of sites in your organization. `is_user_assigned` is `true` for sites on your key's team, where you can file work orders.
+Results are paginated with `skip` and `limit`. `total` is the number of sites in your organization. `is_user_assigned` is `true` for sites on your key's team, where you can file work orders. `external_id` is your own id for a site you sent inline, and `null` otherwise.
