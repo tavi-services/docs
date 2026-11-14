@@ -31,8 +31,8 @@ Use the fields below for detail within `ACTIVE`.
 | Field | What it tells you |
 | --- | --- |
 | `options` | One entry per provider option, anonymized as `alias` (for example "Option A"). Once Tavi publishes an option, it carries `quoted_price_dollars`, `pre_tax_amount`, `tax_amount`, `scope_of_work` and the provider's checks (`has_insurance`, `has_license`, `has_w9`, `has_references`). `is_recommended` marks Tavi's pick. See [approving an option](#approve-an-option). |
-| `has_dispatched_option` | `true` once a provider is booked. |
-| `awarded_options` | The booked option, with its price and `payment_terms`. |
+| `has_dispatched_option` | `true` once a provider is booked, including one booked within your do-not-exceed without a published option. |
+| `awarded_options` | The booked option, with its price and `payment_terms`. Listed only when the option was published, so it can be empty while `has_dispatched_option` is `true`. |
 | `visits` | Site visits and work visits, oldest first, each with `scheduled_at`, `duration_minutes` and a `status` of `scheduled`, `completed` or `not_finished`. |
 | `change_orders` | Additional work requested on the work order. |
 
