@@ -43,7 +43,7 @@ Prices are all-in amounts in US dollars, with tax shown in `tax_amount`.
 | Field | What it tells you |
 | --- | --- |
 | `total_amount` | Everything billed to you on the work order so far, across all providers, with tax. It grows as work is booked or added. Once `job_status` is `COMPLETED`, it is the final cost. |
-| `paid_amount` | What you have paid toward `total_amount` so far, as Tavi received it. |
+| `paid_amount` | What you have paid toward `total_amount` so far, as Tavi received it. It can be higher than `total_amount` if a payment was larger than the amount billed. |
 
 Both are `0` until a provider is booked. For example, with a $1,000 do-not-exceed, a $200 plumber's trip charge followed by a $500 HVAC repair reads `"total_amount": 700.0`.
 
