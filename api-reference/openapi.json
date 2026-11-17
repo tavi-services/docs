@@ -68,20 +68,13 @@
             "description": "Site or equipment not found."
           },
           "400": {
-            "description": "The work order or site contact is invalid."
+            "description": "The work order or site contact is invalid, or an inline site was sent by an account with no organization of its own."
           },
           "409": {
             "description": "The site contact's phone belongs to another account."
           },
           "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
+            "description": "The request is malformed, or the inline site's address can't be found."
           }
         }
       }
@@ -135,6 +128,25 @@
               "title": "Location Id"
             },
             "description": "Only work orders at this site."
+          },
+          {
+            "name": "site_external_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by your own id for the site (the inline site's external_id)",
+              "title": "Site External Id"
+            },
+            "description": "Filter by your own id for the site (the inline site's external_id)"
           },
           {
             "name": "asset_id",
@@ -857,9 +869,28 @@
       "ClientJobCreateRequest": {
         "properties": {
           "location_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Location Id"
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id",
+            "description": "The Tavi site id. Send either location_id or site."
+          },
+          "site": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClientSiteUpsertRequest"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The site, sent inline and keyed by your own id for it. Tavi creates the site the first time it sees the external_id and updates its name and address when they change. Send either location_id or site."
           },
           "trade": {
             "type": "string",
@@ -968,7 +999,6 @@
         },
         "type": "object",
         "required": [
-          "location_id",
           "trade",
           "description",
           "deadline_date"
@@ -1138,6 +1168,18 @@
             "type": "array",
             "title": "Awarded Options",
             "default": []
+          },
+          "total_amount": {
+            "type": "number",
+            "title": "Total Amount",
+            "description": "Everything billed to you on this work order so far, in US dollars with tax, across all providers. Grows as work is booked and added; its value once the work order is completed is the final cost.",
+            "default": 0.0
+          },
+          "paid_amount": {
+            "type": "number",
+            "title": "Paid Amount",
+            "description": "The part of total_amount you have paid, in US dollars.",
+            "default": 0.0
           },
           "visits": {
             "items": {
@@ -1834,6 +1876,75 @@
         "title": "ClientSiteContactCreateRequest",
         "description": "The person at the site Tavi coordinates the visit with."
       },
+      "ClientSiteUpsertRequest": {
+        "properties": {
+          "external_id": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "External Id",
+            "description": "Your own id for this site. Stable across address changes."
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "address_line_1": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Address Line 1"
+          },
+          "address_line_2": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Line 2"
+          },
+          "city": {
+            "type": "string",
+            "minLength": 1,
+            "title": "City"
+          },
+          "state": {
+            "type": "string",
+            "minLength": 1,
+            "title": "State"
+          },
+          "postal_code": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Postal Code"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Country"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": "US"
+          }
+        },
+        "type": "object",
+        "required": [
+          "external_id",
+          "name",
+          "address_line_1",
+          "city",
+          "state",
+          "postal_code"
+        ],
+        "title": "ClientSiteUpsertRequest"
+      },
       "Country": {
         "type": "string",
         "enum": [
@@ -1851,6 +1962,7 @@
           "ONBOARDING_SIGNATURE",
           "EXECUTED_MSA",
           "VENDOR_FAVICON",
+          "USER_AVATAR",
           "VENDOR_AGREEMENT",
           "CUSTOMER_AGREEMENT",
           "SIGNED_VENDOR_AGREEMENT",
@@ -1880,6 +1992,7 @@
           "SCREENING_RECORDING",
           "CALL_RECORDING",
           "TRADE_EXPERT_RECORDING",
+          "ORIGINAL",
           "OTHER"
         ],
         "title": "FileCategory"
@@ -2176,6 +2289,17 @@
             ],
             "title": "Servicechannel Location Id"
           },
+          "external_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Id"
+          },
           "location_notes": {
             "anyOf": [
               {
@@ -2186,6 +2310,31 @@
               }
             ],
             "title": "Location Notes"
+          },
+          "access_instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Access Instructions"
+          },
+          "servicechannel_location_fields": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ServiceChannelLocationFieldResponse"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Servicechannel Location Fields"
           },
           "created_at": {
             "type": "string",
@@ -2280,6 +2429,17 @@
           "timezone": {
             "type": "string",
             "title": "Timezone"
+          },
+          "external_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Id"
           }
         },
         "type": "object",
@@ -2361,6 +2521,24 @@
           "MONTHLY"
         ],
         "title": "RecurrenceFrequency"
+      },
+      "ServiceChannelLocationFieldResponse": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "value": {
+            "type": "string",
+            "title": "Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "value"
+        ],
+        "title": "ServiceChannelLocationFieldResponse"
       },
       "ValidationError": {
         "properties": {
