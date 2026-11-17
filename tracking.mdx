@@ -38,6 +38,15 @@ Use the fields below for detail within `ACTIVE`.
 
 Prices are all-in amounts in US dollars, with tax shown in `tax_amount`.
 
+## Cost
+
+| Field | What it tells you |
+| --- | --- |
+| `total_amount` | Everything billed to you on the work order so far, across all providers, with tax. It grows as work is booked or added. Once `job_status` is `COMPLETED`, it is the final cost. |
+| `paid_amount` | What you have paid toward `total_amount` so far, as Tavi received it. |
+
+Both are `0` until a provider is booked. For example, with a $1,000 do-not-exceed, a $200 plumber's trip charge followed by a $500 HVAC repair reads `"total_amount": 700.0`.
+
 ## Approve an option
 
 When Tavi has quotes, it publishes them as options and the work order waits for your pick. An option you can approve has `is_approvable: true`. Approve it by its letter ("B" for "Option B"), sending its terms as you read them:
