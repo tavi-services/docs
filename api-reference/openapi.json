@@ -1178,7 +1178,7 @@
           "paid_amount": {
             "type": "number",
             "title": "Paid Amount",
-            "description": "The part of total_amount you have paid, in US dollars.",
+            "description": "What you have paid toward total_amount so far, in US dollars, as received.",
             "default": 0.0
           },
           "visits": {
