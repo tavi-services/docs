@@ -22,6 +22,7 @@ Content-Type: application/json
 | `site_contact` | No | The person at the site Tavi calls or texts to arrange access and the visit. See below. |
 | `escalation_contact` | No | Who Tavi goes to when the site contact can't decide, such as a facility manager. See below. |
 | `context` | No | Anything else Tavi should know, such as access instructions or opening hours. Up to 4,000 characters. |
+| `external_reference` | No | Your own id for the work order, such as your service order id. Printed on its quote, agreement and invoices, and returned on the work order. Up to 255 characters. |
 
 The response is the new work order in the same shape as [reading a work order](/tracking). Its `job_status` starts as `DRAFT`.
 

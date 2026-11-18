@@ -972,6 +972,20 @@
             ],
             "description": "The on-site contact Tavi coordinates the visit with. Matched by phone to an existing contact in your organization, or created, and added to the site's team. Use instead of client_owner_user_id."
           },
+          "external_reference": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Reference",
+            "description": "Your own id for this work order. Shown on its quote, agreement and invoices, and returned on the work order."
+          },
           "escalation_contact": {
             "anyOf": [
               {
@@ -1168,6 +1182,18 @@
             "type": "array",
             "title": "Awarded Options",
             "default": []
+          },
+          "external_reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Reference",
+            "description": "Your own id for this work order, as sent when you created it."
           },
           "total_amount": {
             "type": "number",
